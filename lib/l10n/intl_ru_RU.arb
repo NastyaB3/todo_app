@@ -1,0 +1,11 @@
+{
+  "appBar": "Мои дела",
+  "newDeal": "Новое",
+  "done": "Выполнено",
+  "save": "СОХРАНИТЬ",
+  "needToDo": "Что надо сделать..",
+  "importance": "Важность",
+  "needToBeDoneBefore": "Сделать до",
+  "delete": "Удалить",
+  "ready" : "ГОТОВО"
+}

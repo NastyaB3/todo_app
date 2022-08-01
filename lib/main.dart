@@ -1,6 +1,21 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_app/navigation/routes.dart';
+import 'package:todo_app/screens/detail_screen.dart';
+import 'package:todo_app/screens/main_screen.dart';
+
+import 'common/di/app_config.dart';
+import 'common/res/theme/theme.dart';
+import 'common/res/theme/todo_text_theme.dart';
+import 'generated/l10n.dart';
+import 'navigation/controller.dart';
 
 void main() {
+  configureDependencies();
   runApp(const MyApp());
 }
 
@@ -9,26 +24,238 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(),
+    final navigationController = NavigationController();
+    final colorsLightTheme = ColorsTheme(
+      separatorColor: const Color(0xff000000).withOpacity(0.2),
+      overlayColor: const Color(0xff000000).withOpacity(0.06),
+      primaryColor: const Color(0xff000000),
+      secondaryColor: const Color(0xff000000).withOpacity(0.6),
+      tertiaryColor: const Color(0xff000000).withOpacity(0.3),
+      disableColor: const Color(0xff000000).withOpacity(0.15),
+      redColor: const Color(0xffFF3B30),
+      greenColor: const Color(0xff34C759),
+      blueColor: const Color(0xff007AFF),
+      grayColor: const Color(0xff8E8E93),
+      grayLightColor: const Color(0xffD1D1D6),
+      whiteColor: const Color(0xffFFFFFF),
+      backPrimaryColor: const Color(0xffF7F6F2),
+      backSecondaryColor: const Color(0xffFFFFFF),
+      backElevatedColor: const Color(0xffFFFFFF),
     );
-  }
-}
+    final colorsBlackTheme = ColorsTheme(
+      separatorColor: const Color(0xff000000).withOpacity(0.2),
+      overlayColor: const Color(0xff000000).withOpacity(0.32),
+      primaryColor: const Color(0xffFFFFFF),
+      secondaryColor: const Color(0xffFFFFFF).withOpacity(0.6),
+      tertiaryColor: const Color(0xffFFFFFF).withOpacity(0.4),
+      disableColor: const Color(0xffFFFFFF).withOpacity(0.15),
+      redColor: const Color(0xffFF453A),
+      greenColor: const Color(0xff32D74B),
+      blueColor: const Color(0xff0A84FF),
+      grayColor: const Color(0xff8E8E93),
+      grayLightColor: const Color(0xff48484A),
+      whiteColor: const Color(0xffFFFFFF),
+      backPrimaryColor: const Color(0xff161618),
+      backSecondaryColor: const Color(0xff252528),
+      backElevatedColor: const Color(0xff3C3C3F),
+    );
+    final textThemeLight = TodoTextTheme(
+      largeTitle: TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 32,
+        height: 37.5 / 32,
+        color: colorsLightTheme.primaryColor,
+        fontFamily: 'Roboto',
+      ),
+      title: TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 20,
+        letterSpacing: 0.5,
+        height: 32 / 20,
+        color: colorsLightTheme.primaryColor,
+        fontFamily: 'Roboto',
+      ),
+      button: TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 14,
+        letterSpacing: 0.16,
+        height: 24 / 14,
+        color: colorsLightTheme.primaryColor,
+        fontFamily: 'Roboto',
+      ),
+      body: TextStyle(
+        fontWeight: FontWeight.w400,
+        fontSize: 16,
+        height: 20 / 16,
+        color: colorsLightTheme.primaryColor,
+        fontFamily: 'Roboto',
+      ),
+      subhead: TextStyle(
+        fontWeight: FontWeight.w400,
+        fontSize: 14,
+        height: 20 / 14,
+        color: colorsLightTheme.primaryColor,
+        fontFamily: 'Roboto',
+      ),
+    );
+    final textThemeBlack = TodoTextTheme(
+      largeTitle: TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 32,
+        height: 37.5 / 32,
+        color: colorsBlackTheme.primaryColor,
+        fontFamily: 'Roboto',
+      ),
+      title: TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 20,
+        letterSpacing: 0.5,
+        height: 32 / 20,
+        color: colorsBlackTheme.primaryColor,
+        fontFamily: 'Roboto',
+      ),
+      button: TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 14,
+        letterSpacing: 0.16,
+        height: 24 / 14,
+        color: colorsBlackTheme.primaryColor,
+        fontFamily: 'Roboto',
+      ),
+      body: TextStyle(
+        fontWeight: FontWeight.w400,
+        fontSize: 16,
+        height: 20 / 16,
+        color: colorsBlackTheme.primaryColor,
+        fontFamily: 'Roboto',
+      ),
+      subhead: TextStyle(
+        fontWeight: FontWeight.w400,
+        fontSize: 14,
+        height: 20 / 14,
+        color: colorsBlackTheme.primaryColor,
+        fontFamily: 'Roboto',
+      ),
+    );
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+    return Provider<NavigationController>.value(
+      value: navigationController,
+      child: MaterialApp(
+        localizationsDelegates: const [
+          S.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: S.delegate.supportedLocales,
+        debugShowCheckedModeBanner: false,
+        initialRoute: Routes.mainScreen,
+        themeMode: ThemeMode.light,
+        theme: ThemeData.light().copyWith(
+          extensions: <ThemeExtension<dynamic>>[
+            colorsLightTheme,
+            textThemeLight,
+          ],
+        ),
+        darkTheme: ThemeData.dark().copyWith(
+          extensions: <ThemeExtension<dynamic>>[
+            colorsBlackTheme,
+            textThemeBlack,
+          ],
+        ),
+        onGenerateRoute: (settings) {
+          switch (settings.name) {
+            case Routes.mainScreen:
+              return MaterialPageRoute(
+                builder: (_) {
+                  return MainScreen.newInstance();
+                },
+              );
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
+            case Routes.detailScreen:
+              return MaterialPageRoute(
+                builder: (_) {
+                  return DetailScreen.newInstance();
+                },
+              );
 
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold();
+            default:
+              return MaterialPageRoute(
+                  builder: (_) => MainScreen.newInstance());
+          }
+        },
+        navigatorKey: navigationController.key,
+      ),
+    );
+    //   : CupertinoApp(
+    //       navigatorKey: navigationController.key,
+    //       initialRoute: Routes.mainScreen,
+    // theme: ThemeData.light().copyWith(
+    //   extensions: <ThemeExtension<dynamic>>[
+    //     ColorsTheme(
+    //       separatorColor: const Color(0xff000000).withOpacity(0.2),
+    //       overlayColor: const Color(0xff000000).withOpacity(0.06),
+    //       primaryColor: const Color(0xff000000),
+    //       secondaryColor: const Color(0xff000000).withOpacity(0.6),
+    //       tertiaryColor: const Color(0xff000000).withOpacity(0.3),
+    //       disableColor: const Color(0xff000000).withOpacity(0.15),
+    //       redColor: const Color(0xffFF3B30),
+    //       greenColor: const Color(0xff34C759),
+    //       blueColor: const Color(0xff007AFF),
+    //       grayColor: const Color(0xff8E8E93),
+    //       grayLightColor: const Color(0xffD1D1D6),
+    //       whiteColor: const Color(0xffFFFFFF),
+    //       backPrimaryColor: const Color(0xffF7F6F2),
+    //       backSecondaryColor: const Color(0xffFFFFFF),
+    //       backElevatedColor: const Color(0xffFFFFFF),
+    //     ),
+    //   ],
+    // ),
+    // darkTheme: ThemeData.dark().copyWith(
+    //   extensions: <ThemeExtension<dynamic>>[
+    //     ColorsTheme(
+    //       separatorColor: const Color(0xff000000).withOpacity(0.2),
+    //       overlayColor: const Color(0xff000000).withOpacity(0.32),
+    //       primaryColor: const Color(0xffFFFFFF),
+    //       secondaryColor: const Color(0xffFFFFFF).withOpacity(0.6),
+    //       tertiaryColor: const Color(0xffFFFFFF).withOpacity(0.4),
+    //       disableColor: const Color(0xffFFFFFF).withOpacity(0.15),
+    //       redColor: const Color(0xffFF453A),
+    //       greenColor: const Color(0xff32D74B),
+    //       blueColor: const Color(0xff0A84FF),
+    //       grayColor: const Color(0xff8E8E93),
+    //       grayLightColor: const Color(0xff48484A),
+    //       whiteColor: const Color(0xffFFFFFF),
+    //       backPrimaryColor: const Color(0xff161618),
+    //       backSecondaryColor: const Color(0xff252528),
+    //       backElevatedColor: const Color(0xff3C3C3F),
+    //     ),
+    //   ],
+    // ),
+    //       onGenerateRoute: (settings) {
+    //         switch (settings.name) {
+    //           case Routes.mainScreen:
+    //             return CupertinoPageRoute(
+    //               builder: (_) {
+    //                 return const MainScreen();
+    //               },
+    //             );
+    //
+    //           case Routes.detailScreen:
+    //             return CupertinoPageRoute(
+    //               builder: (_) {
+    //                 return const DetailScreen();
+    //               },
+    //             );
+    //
+    //           default:
+    //             return CupertinoPageRoute(
+    //               builder: (_) {
+    //                 return const MainScreen();
+    //               },
+    //             );
+    //         }
+    //       },
+    //     );
   }
 }
