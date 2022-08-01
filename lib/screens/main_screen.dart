@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_app/common/res/images.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:todo_app/domain/todo_actions/todo_actions_cubit.dart';
 import 'package:todo_app/navigation/routes.dart';
 import 'package:todo_app/widgets/text_field_custom.dart';
@@ -234,11 +234,11 @@ class StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     final colors = Theme.of(context).extension<ColorsTheme>()!;
-    print(shrinkOffset);
+    print('shrinkOffset: $shrinkOffset');
+    print('minExtent: $minExtent');
     if (shrinkOffset > 40 &&
         MediaQuery.of(context).orientation == Orientation.portrait) {
       return Container(
-        height: kToolbarHeight + topPadding,
         decoration: BoxDecoration(
           color: colors.backPrimaryColor,
           boxShadow: const [
@@ -253,13 +253,11 @@ class StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
           left: 16,
           top: topPadding,
         ),
-        child: Center(
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              S.of(context).appBar,
-              style: Theme.of(context).extension<TodoTextTheme>()?.title,
-            ),
+        child: Align(
+          alignment: Alignment.bottomLeft,
+          child: Text(
+            S.of(context).appBar,
+            style: Theme.of(context).extension<TodoTextTheme>()?.title,
           ),
         ),
       );
@@ -267,48 +265,47 @@ class StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
 
     if (shrinkOffset < 40 &&
         MediaQuery.of(context).orientation == Orientation.portrait) {
-      return Positioned(
-        top: MediaQuery.of(context).padding.top + kToolbarHeight,
-        child: Container(
-          // color: Theme.of(context).backgroundColor,
-          padding: EdgeInsets.only(
-            left: 60,
-            top: MediaQuery.of(context).padding.top + kToolbarHeight,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                S.of(context).appBar,
-                style: Theme.of(context).extension<TodoTextTheme>()?.largeTitle,
-              ),
-              const SizedBox(
-                height: 6,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    S.of(context).done,
-                    style: Theme.of(context)
-                        .extension<TodoTextTheme>()
-                        ?.body
-                        ?.copyWith(
-                          color: Theme.of(context)
-                              .extension<ColorsTheme>()
-                              ?.tertiaryColor,
-                        ),
-                  ),
-                  Padding(
-                      padding: const EdgeInsets.only(right: 25),
-                      child: Icon(
-                        Icons.remove_red_eye,
-                        color: colors.blueColor,
-                      )),
-                ],
-              ),
-            ],
-          ),
+      return Container(
+        // color: Theme.of(context).backgroundColor,
+        padding: EdgeInsets.only(
+          left: 60,
+          top: MediaQuery.of(context).padding.top +
+              kToolbarHeight -
+              shrinkOffset,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              S.of(context).appBar,
+              style: Theme.of(context).extension<TodoTextTheme>()?.largeTitle,
+            ),
+            const SizedBox(
+              height: 6,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  S.of(context).done,
+                  style: Theme.of(context)
+                      .extension<TodoTextTheme>()
+                      ?.body
+                      ?.copyWith(
+                        color: Theme.of(context)
+                            .extension<ColorsTheme>()
+                            ?.tertiaryColor,
+                      ),
+                ),
+                Padding(
+                    padding: const EdgeInsets.only(right: 25),
+                    child: Icon(
+                      Icons.remove_red_eye,
+                      color: colors.blueColor,
+                    )),
+              ],
+            ),
+          ],
         ),
       );
     }
@@ -327,8 +324,9 @@ class StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => 140 + topPadding;
 
   @override
-  // double get minExtent => kToolbarHeight + topPadding;
-  double get minExtent => 0;
+  double get minExtent => kToolbarHeight + topPadding;
+
+  // double get minExtent => 0;
 
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
