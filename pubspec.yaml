@@ -30,6 +30,11 @@ dependencies:
   flutter_bloc: 8.0.1
   platform_device_id: 1.0.1
   uuid: 3.0.6
+  logging: 1.0.2
+  firebase_core: 1.20.0
+  shared_preferences: 2.0.15
+  firebase_remote_config: 2.0.13
+  firebase_crashlytics: 2.8.6
 
 dev_dependencies:
   flutter_test:

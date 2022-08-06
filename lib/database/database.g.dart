@@ -8,10 +8,9 @@ part of 'database.dart';
 
 // ignore_for_file: type=lint
 class TodoTableData extends DataClass implements Insertable<TodoTableData> {
-  final String? id;
-  final String localId;
+  final String id;
   final String title;
-  final String importance;
+  final Importance importance;
   final DateTime? deadline;
   final bool done;
   final String? color;
@@ -19,8 +18,7 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
   final DateTime changedAt;
   final String lastUpdatedBy;
   TodoTableData(
-      {this.id,
-      required this.localId,
+      {required this.id,
       required this.title,
       required this.importance,
       this.deadline,
@@ -33,13 +31,11 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
     final effectivePrefix = prefix ?? '';
     return TodoTableData(
       id: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}id']),
-      localId: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}local_id'])!,
+          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
       title: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}title'])!,
-      importance: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}importance'])!,
+      importance: $TodoTableTable.$converter0.mapToDart(const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}importance']))!,
       deadline: const DateTimeType()
           .mapFromDatabaseResponse(data['${effectivePrefix}deadline']),
       done: const BoolType()
@@ -57,12 +53,12 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (!nullToAbsent || id != null) {
-      map['id'] = Variable<String?>(id);
-    }
-    map['local_id'] = Variable<String>(localId);
+    map['id'] = Variable<String>(id);
     map['title'] = Variable<String>(title);
-    map['importance'] = Variable<String>(importance);
+    {
+      final converter = $TodoTableTable.$converter0;
+      map['importance'] = Variable<String>(converter.mapToSql(importance)!);
+    }
     if (!nullToAbsent || deadline != null) {
       map['deadline'] = Variable<DateTime?>(deadline);
     }
@@ -78,8 +74,7 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
 
   TodoTableCompanion toCompanion(bool nullToAbsent) {
     return TodoTableCompanion(
-      id: id == null && nullToAbsent ? const Value.absent() : Value(id),
-      localId: Value(localId),
+      id: Value(id),
       title: Value(title),
       importance: Value(importance),
       deadline: deadline == null && nullToAbsent
@@ -98,10 +93,10 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return TodoTableData(
-      id: serializer.fromJson<String?>(json['id']),
-      localId: serializer.fromJson<String>(json['localId']),
+      id: serializer.fromJson<String>(json['id']),
       title: serializer.fromJson<String>(json['title']),
-      importance: serializer.fromJson<String>(json['importance']),
+      importance: $TodoTableTable.$converter0
+          .fromJson(serializer.fromJson<String?>(json['importance']))!,
       deadline: serializer.fromJson<DateTime?>(json['deadline']),
       done: serializer.fromJson<bool>(json['done']),
       color: serializer.fromJson<String?>(json['color']),
@@ -114,10 +109,10 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<String?>(id),
-      'localId': serializer.toJson<String>(localId),
+      'id': serializer.toJson<String>(id),
       'title': serializer.toJson<String>(title),
-      'importance': serializer.toJson<String>(importance),
+      'importance': serializer
+          .toJson<String?>($TodoTableTable.$converter0.toJson(importance)),
       'deadline': serializer.toJson<DateTime?>(deadline),
       'done': serializer.toJson<bool>(done),
       'color': serializer.toJson<String?>(color),
@@ -129,9 +124,8 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
 
   TodoTableData copyWith(
           {String? id,
-          String? localId,
           String? title,
-          String? importance,
+          Importance? importance,
           DateTime? deadline,
           bool? done,
           String? color,
@@ -140,7 +134,6 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
           String? lastUpdatedBy}) =>
       TodoTableData(
         id: id ?? this.id,
-        localId: localId ?? this.localId,
         title: title ?? this.title,
         importance: importance ?? this.importance,
         deadline: deadline ?? this.deadline,
@@ -154,7 +147,6 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
   String toString() {
     return (StringBuffer('TodoTableData(')
           ..write('id: $id, ')
-          ..write('localId: $localId, ')
           ..write('title: $title, ')
           ..write('importance: $importance, ')
           ..write('deadline: $deadline, ')
@@ -168,14 +160,13 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
   }
 
   @override
-  int get hashCode => Object.hash(id, localId, title, importance, deadline,
-      done, color, createdAt, changedAt, lastUpdatedBy);
+  int get hashCode => Object.hash(id, title, importance, deadline, done, color,
+      createdAt, changedAt, lastUpdatedBy);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is TodoTableData &&
           other.id == this.id &&
-          other.localId == this.localId &&
           other.title == this.title &&
           other.importance == this.importance &&
           other.deadline == this.deadline &&
@@ -187,10 +178,9 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
 }
 
 class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
-  final Value<String?> id;
-  final Value<String> localId;
+  final Value<String> id;
   final Value<String> title;
-  final Value<String> importance;
+  final Value<Importance> importance;
   final Value<DateTime?> deadline;
   final Value<bool> done;
   final Value<String?> color;
@@ -199,7 +189,6 @@ class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
   final Value<String> lastUpdatedBy;
   const TodoTableCompanion({
     this.id = const Value.absent(),
-    this.localId = const Value.absent(),
     this.title = const Value.absent(),
     this.importance = const Value.absent(),
     this.deadline = const Value.absent(),
@@ -210,27 +199,26 @@ class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
     this.lastUpdatedBy = const Value.absent(),
   });
   TodoTableCompanion.insert({
-    this.id = const Value.absent(),
-    required String localId,
+    required String id,
     required String title,
-    this.importance = const Value.absent(),
+    required Importance importance,
     this.deadline = const Value.absent(),
     required bool done,
     this.color = const Value.absent(),
     required DateTime createdAt,
     required DateTime changedAt,
     required String lastUpdatedBy,
-  })  : localId = Value(localId),
+  })  : id = Value(id),
         title = Value(title),
+        importance = Value(importance),
         done = Value(done),
         createdAt = Value(createdAt),
         changedAt = Value(changedAt),
         lastUpdatedBy = Value(lastUpdatedBy);
   static Insertable<TodoTableData> custom({
-    Expression<String?>? id,
-    Expression<String>? localId,
+    Expression<String>? id,
     Expression<String>? title,
-    Expression<String>? importance,
+    Expression<Importance>? importance,
     Expression<DateTime?>? deadline,
     Expression<bool>? done,
     Expression<String?>? color,
@@ -240,7 +228,6 @@ class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (localId != null) 'local_id': localId,
       if (title != null) 'title': title,
       if (importance != null) 'importance': importance,
       if (deadline != null) 'deadline': deadline,
@@ -253,10 +240,9 @@ class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
   }
 
   TodoTableCompanion copyWith(
-      {Value<String?>? id,
-      Value<String>? localId,
+      {Value<String>? id,
       Value<String>? title,
-      Value<String>? importance,
+      Value<Importance>? importance,
       Value<DateTime?>? deadline,
       Value<bool>? done,
       Value<String?>? color,
@@ -265,7 +251,6 @@ class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
       Value<String>? lastUpdatedBy}) {
     return TodoTableCompanion(
       id: id ?? this.id,
-      localId: localId ?? this.localId,
       title: title ?? this.title,
       importance: importance ?? this.importance,
       deadline: deadline ?? this.deadline,
@@ -281,16 +266,15 @@ class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<String?>(id.value);
-    }
-    if (localId.present) {
-      map['local_id'] = Variable<String>(localId.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (title.present) {
       map['title'] = Variable<String>(title.value);
     }
     if (importance.present) {
-      map['importance'] = Variable<String>(importance.value);
+      final converter = $TodoTableTable.$converter0;
+      map['importance'] =
+          Variable<String>(converter.mapToSql(importance.value)!);
     }
     if (deadline.present) {
       map['deadline'] = Variable<DateTime?>(deadline.value);
@@ -317,7 +301,6 @@ class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
   String toString() {
     return (StringBuffer('TodoTableCompanion(')
           ..write('id: $id, ')
-          ..write('localId: $localId, ')
           ..write('title: $title, ')
           ..write('importance: $importance, ')
           ..write('deadline: $deadline, ')
@@ -340,13 +323,10 @@ class $TodoTableTable extends TodoTable
   final VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String?> id = GeneratedColumn<String?>(
-      'id', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
-  final VerificationMeta _localIdMeta = const VerificationMeta('localId');
-  @override
-  late final GeneratedColumn<String?> localId = GeneratedColumn<String?>(
-      'local_id', aliasedName, false,
-      type: const StringType(), requiredDuringInsert: true);
+      'id', aliasedName, false,
+      type: const StringType(),
+      requiredDuringInsert: true,
+      defaultConstraints: 'UNIQUE');
   final VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String?> title = GeneratedColumn<String?>(
@@ -354,11 +334,10 @@ class $TodoTableTable extends TodoTable
       type: const StringType(), requiredDuringInsert: true);
   final VerificationMeta _importanceMeta = const VerificationMeta('importance');
   @override
-  late final GeneratedColumn<String?> importance = GeneratedColumn<String?>(
-      'importance', aliasedName, false,
-      type: const StringType(),
-      requiredDuringInsert: false,
-      defaultValue: const Constant('Нет'));
+  late final GeneratedColumnWithTypeConverter<Importance, String?> importance =
+      GeneratedColumn<String?>('importance', aliasedName, false,
+              type: const StringType(), requiredDuringInsert: true)
+          .withConverter<Importance>($TodoTableTable.$converter0);
   final VerificationMeta _deadlineMeta = const VerificationMeta('deadline');
   @override
   late final GeneratedColumn<DateTime?> deadline = GeneratedColumn<DateTime?>(
@@ -395,7 +374,6 @@ class $TodoTableTable extends TodoTable
   @override
   List<GeneratedColumn> get $columns => [
         id,
-        localId,
         title,
         importance,
         deadline,
@@ -416,12 +394,8 @@ class $TodoTableTable extends TodoTable
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('local_id')) {
-      context.handle(_localIdMeta,
-          localId.isAcceptableOrUnknown(data['local_id']!, _localIdMeta));
     } else if (isInserting) {
-      context.missing(_localIdMeta);
+      context.missing(_idMeta);
     }
     if (data.containsKey('title')) {
       context.handle(
@@ -429,12 +403,7 @@ class $TodoTableTable extends TodoTable
     } else if (isInserting) {
       context.missing(_titleMeta);
     }
-    if (data.containsKey('importance')) {
-      context.handle(
-          _importanceMeta,
-          importance.isAcceptableOrUnknown(
-              data['importance']!, _importanceMeta));
-    }
+    context.handle(_importanceMeta, const VerificationResult.success());
     if (data.containsKey('deadline')) {
       context.handle(_deadlineMeta,
           deadline.isAcceptableOrUnknown(data['deadline']!, _deadlineMeta));
@@ -473,7 +442,7 @@ class $TodoTableTable extends TodoTable
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id, localId};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   TodoTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
     return TodoTableData.fromData(data,
@@ -484,6 +453,9 @@ class $TodoTableTable extends TodoTable
   $TodoTableTable createAlias(String alias) {
     return $TodoTableTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter<Importance, String> $converter0 =
+      const ImportanceConverter();
 }
 
 abstract class _$AppDb extends GeneratedDatabase {

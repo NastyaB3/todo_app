@@ -4,19 +4,29 @@ import '../common/res/theme/theme.dart';
 import '../common/res/theme/todo_text_theme.dart';
 
 class TextFieldCustom extends StatelessWidget {
-  String hintText;
-  Widget? prefixIcon;
-  ValueChanged<String>? onChanged;
-  TextEditingController? controller;
-  String? errorText;
+  final String hintText;
+  final Widget? prefixIcon;
+  final ValueChanged<String>? onChanged;
+  final TextEditingController? controller;
+  final String? errorText;
+  final ValueChanged<String>? onSubmitted;
+  final TextInputType? keyboardType;
+  final int? maxLines;
+  final int? minLines;
+  final FocusNode? focusNode;
 
-  TextFieldCustom({
+  const TextFieldCustom({
     Key? key,
     required this.hintText,
     this.prefixIcon,
     this.onChanged,
+    this.onSubmitted,
     this.controller,
     this.errorText,
+    this.keyboardType,
+    this.maxLines,
+    this.focusNode,
+    this.minLines,
   }) : super(key: key);
 
   @override
@@ -25,8 +35,13 @@ class TextFieldCustom extends StatelessWidget {
     final textStyles = Theme.of(context).extension<TodoTextTheme>();
     return TextField(
       onChanged: onChanged,
+      focusNode: focusNode,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      onSubmitted: onSubmitted,
       style: textStyles!.body!.copyWith(color: colors!.primaryColor),
       controller: controller,
+      minLines: minLines,
       decoration: InputDecoration(
         errorText: errorText,
         fillColor: colors.whiteColor,

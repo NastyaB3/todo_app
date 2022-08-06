@@ -11,12 +11,28 @@ class DetailCubit extends Cubit<DetailState> {
 
   DetailCubit(this._repository) : super(DetailInitial());
 
-  Future<void> addTodo({
+  Future<void> add({
     required TodoTableData task,
   }) async {
     emit(DetailLoading());
     try {
-      await _repository.addTodo(task);
+      await _repository.add(task);
+      emit(DetailSuccess());
+    } catch (e) {
+      emit(
+        DetailError(
+          e.toString(),
+        ),
+      );
+    }
+  }
+
+  Future<void> edit({
+    required TodoTableData task,
+  }) async {
+    emit(DetailLoading());
+    try {
+      await _repository.edit(task);
       emit(DetailSuccess());
     } catch (e) {
       emit(

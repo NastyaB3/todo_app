@@ -98,5 +98,3 @@ class ColorsTheme extends ThemeExtension<ColorsTheme> {
     );
   }
 }
-
-

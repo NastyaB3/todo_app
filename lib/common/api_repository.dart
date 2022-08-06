@@ -15,7 +15,15 @@ class ApiRepository {
         ),
       );
 
-      _instance?.interceptors.add(AuthInterceptors());
+      _instance?.interceptors.add(
+        AuthInterceptors(),
+      );
+      _instance?.interceptors.add(
+        LogInterceptor(
+          requestBody: true,
+          responseBody: true,
+        ),
+      );
     }
 
     return _instance!;
