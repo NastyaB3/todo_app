@@ -14,12 +14,15 @@ class TodoActionsCubit extends Cubit<TodoActionsState> {
   Future<void> toggleDone(
     TodoTableData task,
   ) async {
-    _repository.edit(task.copyWith(done: !task.done));
+    final edited = task.copyWith(
+      done: !task.done,
+    );
+    _repository.edit(edited);
   }
 
   Future<void> delete(
     TodoTableData task,
   ) async {
-    _repository.remove(task);
+    _repository.remove(task.id);
   }
 }

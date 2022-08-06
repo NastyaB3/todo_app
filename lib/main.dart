@@ -1,9 +1,13 @@
-import 'dart:io';
-
+import 'dart:async';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_app/common/error/errorHandler.dart';
+import 'package:todo_app/common/error/logging.dart';
+import 'package:todo_app/database/database.dart';
 import 'package:todo_app/navigation/routes.dart';
 import 'package:todo_app/screens/detail_screen.dart';
 import 'package:todo_app/screens/main_screen.dart';
@@ -11,20 +15,35 @@ import 'package:todo_app/screens/main_screen.dart';
 import 'common/di/app_config.dart';
 import 'common/res/theme/theme.dart';
 import 'common/res/theme/todo_text_theme.dart';
+import 'firebase_options.dart';
 import 'generated/l10n.dart';
 import 'navigation/controller.dart';
 
-void main() {
+void main() async {
   configureDependencies();
-  runApp(const MyApp());
+  runZonedGuarded<Future<void>>(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    initLogger();
+    logger.info('Start main');
+    ErrorHandler.init();
+    runApp(MyApp());
+  },
+      (error, stack) =>
+          FirebaseCrashlytics.instance.recordError(error, stack, fatal: true));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final navigationController = NavigationController();
+
+  MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final navigationController = NavigationController();
     final colorsLightTheme = ColorsTheme(
       separatorColor: const Color(0xff000000).withOpacity(0.2),
       overlayColor: const Color(0xff000000).withOpacity(0.06),
@@ -149,7 +168,6 @@ class MyApp extends StatelessWidget {
         ],
         supportedLocales: S.delegate.supportedLocales,
         debugShowCheckedModeBanner: false,
-        initialRoute: Routes.mainScreen,
         themeMode: ThemeMode.light,
         theme: ThemeData.light().copyWith(
           extensions: <ThemeExtension<dynamic>>[
@@ -175,87 +193,22 @@ class MyApp extends StatelessWidget {
             case Routes.detailScreen:
               return MaterialPageRoute(
                 builder: (_) {
-                  return DetailScreen.newInstance();
+                  return DetailScreen.newInstance(
+                    todoTableData: settings.arguments != null
+                        ? settings.arguments as TodoTableData
+                        : null,
+                  );
                 },
               );
 
             default:
               return MaterialPageRoute(
-                  builder: (_) => MainScreen.newInstance());
+                builder: (_) => Container(),
+              );
           }
         },
         navigatorKey: navigationController.key,
       ),
     );
-    //   : CupertinoApp(
-    //       navigatorKey: navigationController.key,
-    //       initialRoute: Routes.mainScreen,
-    // theme: ThemeData.light().copyWith(
-    //   extensions: <ThemeExtension<dynamic>>[
-    //     ColorsTheme(
-    //       separatorColor: const Color(0xff000000).withOpacity(0.2),
-    //       overlayColor: const Color(0xff000000).withOpacity(0.06),
-    //       primaryColor: const Color(0xff000000),
-    //       secondaryColor: const Color(0xff000000).withOpacity(0.6),
-    //       tertiaryColor: const Color(0xff000000).withOpacity(0.3),
-    //       disableColor: const Color(0xff000000).withOpacity(0.15),
-    //       redColor: const Color(0xffFF3B30),
-    //       greenColor: const Color(0xff34C759),
-    //       blueColor: const Color(0xff007AFF),
-    //       grayColor: const Color(0xff8E8E93),
-    //       grayLightColor: const Color(0xffD1D1D6),
-    //       whiteColor: const Color(0xffFFFFFF),
-    //       backPrimaryColor: const Color(0xffF7F6F2),
-    //       backSecondaryColor: const Color(0xffFFFFFF),
-    //       backElevatedColor: const Color(0xffFFFFFF),
-    //     ),
-    //   ],
-    // ),
-    // darkTheme: ThemeData.dark().copyWith(
-    //   extensions: <ThemeExtension<dynamic>>[
-    //     ColorsTheme(
-    //       separatorColor: const Color(0xff000000).withOpacity(0.2),
-    //       overlayColor: const Color(0xff000000).withOpacity(0.32),
-    //       primaryColor: const Color(0xffFFFFFF),
-    //       secondaryColor: const Color(0xffFFFFFF).withOpacity(0.6),
-    //       tertiaryColor: const Color(0xffFFFFFF).withOpacity(0.4),
-    //       disableColor: const Color(0xffFFFFFF).withOpacity(0.15),
-    //       redColor: const Color(0xffFF453A),
-    //       greenColor: const Color(0xff32D74B),
-    //       blueColor: const Color(0xff0A84FF),
-    //       grayColor: const Color(0xff8E8E93),
-    //       grayLightColor: const Color(0xff48484A),
-    //       whiteColor: const Color(0xffFFFFFF),
-    //       backPrimaryColor: const Color(0xff161618),
-    //       backSecondaryColor: const Color(0xff252528),
-    //       backElevatedColor: const Color(0xff3C3C3F),
-    //     ),
-    //   ],
-    // ),
-    //       onGenerateRoute: (settings) {
-    //         switch (settings.name) {
-    //           case Routes.mainScreen:
-    //             return CupertinoPageRoute(
-    //               builder: (_) {
-    //                 return const MainScreen();
-    //               },
-    //             );
-    //
-    //           case Routes.detailScreen:
-    //             return CupertinoPageRoute(
-    //               builder: (_) {
-    //                 return const DetailScreen();
-    //               },
-    //             );
-    //
-    //           default:
-    //             return CupertinoPageRoute(
-    //               builder: (_) {
-    //                 return const MainScreen();
-    //               },
-    //             );
-    //         }
-    //       },
-    //     );
   }
 }

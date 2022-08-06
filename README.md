@@ -1,16 +1,21 @@
 # todo_app
 
-A new Flutter project.
+Done
 
-## Getting Started
+##     
 
-This project is a starting point for a Flutter application.
+1) Создан экран со списком дел, есть возможность отмечать дела как сделанные, удалять ненужнеы дела
+2) Создан экран для добавления задачи с дедлайном и возможностью проставить важность задачи
 
-A few resources to get you started if this is your first Flutter project:
+For generating models (for drift_dev)  
+flutter packages pub run build_runner build
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Crashlytics:
+![crashlytics](crashlytics.png "crashlytics")
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Remote Config:
+![remote config](remote_config.png "remote config")
+
+
+android apk:
+<app dir>build/app/outputs/flutter-apk/app-release.apk

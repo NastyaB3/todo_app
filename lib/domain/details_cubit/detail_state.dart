@@ -10,7 +10,7 @@ class DetailSuccess extends DetailState {}
 class DetailLoading extends DetailState {}
 
 class DetailError extends DetailState {
-  String error;
+  final String error;
 
   DetailError(this.error);
 }

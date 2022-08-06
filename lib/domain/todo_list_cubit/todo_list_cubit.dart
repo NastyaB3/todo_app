@@ -6,7 +6,6 @@ import 'package:todo_app/database/database.dart';
 
 import '../../data/repositories/todo_repository.dart';
 
-
 part 'todo_list_state.dart';
 
 class TodoCubit extends Cubit<TodoState> {
@@ -15,12 +14,27 @@ class TodoCubit extends Cubit<TodoState> {
 
   TodoCubit(this._todoRepository) : super(TodoInitial());
 
-  Future<void> fetch() async {
-    _todoSub = _todoRepository.watch().listen(
-      (event) {
+  Future<void> fetch({
+    required bool hideCompleted,
+    required bool refresh,
+  }) async {
+    emit(TodoListLoading());
+    await _todoSub?.cancel();
+    if (refresh) {
+      try {
+        await _todoRepository.syncPlans();
+      } catch (e, stacktrace) {
+        print(stacktrace);
+        emit(TodoListError(e));
+        return;
+      }
+    }
+    _todoSub = _todoRepository.watch(hideCompleted: hideCompleted).listen(
+      (event) async {
         emit(
           TodoListSuccess(
             event,
+            await _todoRepository.countToDo(),
           ),
         );
       },

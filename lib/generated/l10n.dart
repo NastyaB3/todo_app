@@ -139,6 +139,56 @@ class S {
       args: [],
     );
   }
+
+  /// `Низкий`
+  String get low {
+    return Intl.message(
+      'Низкий',
+      name: 'low',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Нет`
+  String get basic {
+    return Intl.message(
+      'Нет',
+      name: 'basic',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `!! Высокий`
+  String get important {
+    return Intl.message(
+      '!! Высокий',
+      name: 'important',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ошибка`
+  String get errorText {
+    return Intl.message(
+      'Ошибка',
+      name: 'errorText',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Попробовать снова`
+  String get retry {
+    return Intl.message(
+      'Попробовать снова',
+      name: 'retry',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

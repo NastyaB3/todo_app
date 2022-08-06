@@ -18,6 +18,6 @@ abstract class TodoModule {
 
   @singleton
   TodoRepository provideRepository(TodosDao toDoDao) {
-    return TodoRepository(toDoDao: toDoDao);
+    return TodoRepository(todoDao: toDoDao);
   }
 }

@@ -7,5 +7,10 @@
   "importance": "Важность",
   "needToBeDoneBefore": "Сделать до",
   "delete": "Удалить",
-  "ready" : "ГОТОВО"
+  "ready" : "ГОТОВО",
+  "low" : "Низкий",
+  "basic" : "Нет",
+  "important" : "!! Высокий",
+  "errorText": "Ошибка",
+  "retry" : "Попробовать снова"
 }

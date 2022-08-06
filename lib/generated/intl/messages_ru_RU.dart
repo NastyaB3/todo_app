@@ -23,14 +23,19 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "appBar": MessageLookupByLibrary.simpleMessage("Мои дела"),
+        "basic": MessageLookupByLibrary.simpleMessage("Нет"),
         "delete": MessageLookupByLibrary.simpleMessage("Удалить"),
         "done": MessageLookupByLibrary.simpleMessage("Выполнено"),
+        "errorText": MessageLookupByLibrary.simpleMessage("Ошибка"),
         "importance": MessageLookupByLibrary.simpleMessage("Важность"),
+        "important": MessageLookupByLibrary.simpleMessage("!! Высокий"),
+        "low": MessageLookupByLibrary.simpleMessage("Низкий"),
         "needToBeDoneBefore":
             MessageLookupByLibrary.simpleMessage("Сделать до"),
         "needToDo": MessageLookupByLibrary.simpleMessage("Что надо сделать.."),
         "newDeal": MessageLookupByLibrary.simpleMessage("Новое"),
         "ready": MessageLookupByLibrary.simpleMessage("ГОТОВО"),
+        "retry": MessageLookupByLibrary.simpleMessage("Попробовать снова"),
         "save": MessageLookupByLibrary.simpleMessage("СОХРАНИТЬ")
       };
 }
