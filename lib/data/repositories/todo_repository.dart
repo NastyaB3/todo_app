@@ -3,9 +3,8 @@ import 'package:todo_app/data/models/plans_response.dart';
 import 'package:todo_app/data/models/plan_response.dart';
 import 'package:todo_app/data/models/todo_table.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../database/database.dart';
-import 'todos_dao.dart';
+import 'package:todo_app/data/repositories/todos_dao.dart';
+import 'package:todo_app/database/database.dart';
 
 class TodoRepository {
   final TodosDao todoDao;

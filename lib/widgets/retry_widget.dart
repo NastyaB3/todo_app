@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:todo_app/generated/l10n.dart';
 
-import '../generated/l10n.dart';
 
 class RetryWidget extends StatelessWidget {
   final String? message;

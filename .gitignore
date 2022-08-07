@@ -35,6 +35,9 @@ migrate_working_dir/
 # Web related
 lib/generated_plugin_registrant.dart
 
+# Local configuration file (sdk path, etc)
+local.properties
+
 # Symbolication related
 app.*.symbols
 

@@ -1,10 +1,8 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/material.dart';
+import 'package:todo_app/data/repositories/todo_repository.dart';
 import 'package:todo_app/database/database.dart';
-
-import '../../data/repositories/todo_repository.dart';
 
 part 'todo_list_state.dart';
 
@@ -23,8 +21,7 @@ class TodoCubit extends Cubit<TodoState> {
     if (refresh) {
       try {
         await _todoRepository.syncPlans();
-      } catch (e, stacktrace) {
-        print(stacktrace);
+      } catch (e) {
         emit(TodoListError(e));
         return;
       }

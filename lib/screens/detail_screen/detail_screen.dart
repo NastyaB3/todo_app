@@ -3,18 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:platform_device_id/platform_device_id.dart';
+import 'package:todo_app/common/di/app_config.dart';
+import 'package:todo_app/common/res/theme/theme.dart';
+import 'package:todo_app/common/res/theme/todo_text_theme.dart';
 import 'package:todo_app/data/models/todo_table.dart';
 import 'package:todo_app/data/repositories/todo_repository.dart';
 import 'package:todo_app/database/database.dart';
 import 'package:todo_app/domain/details_cubit/detail_cubit.dart';
 import 'package:todo_app/domain/todo_actions/todo_actions_cubit.dart';
+import 'package:todo_app/generated/l10n.dart';
+import 'package:todo_app/navigation/controller.dart';
+import 'package:todo_app/screens/detail_screen/detail_header.dart';
+import 'package:todo_app/screens/detail_screen/dropdown_button_detail.dart';
+import 'package:todo_app/widgets/text_field_custom.dart';
 import 'package:uuid/uuid.dart';
-import '../common/di/app_config.dart';
-import '../common/res/theme/theme.dart';
-import '../common/res/theme/todo_text_theme.dart';
-import '../generated/l10n.dart';
-import '../navigation/controller.dart';
-import '../widgets/text_field_custom.dart';
 
 class DetailScreen extends StatefulWidget {
   final TodoTableData? todoTableData;
@@ -99,73 +101,38 @@ class _DetailScreenState extends State<DetailScreen> {
     final textStyles = Theme.of(context).extension<TodoTextTheme>();
     return Scaffold(
       backgroundColor: colors!.backPrimaryColor,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: colors.backPrimaryColor,
-        leading: InkWell(
-          onTap: () {
-            context.read<NavigationController>().pop();
-          },
-          child: Icon(
-            Icons.close,
-            color: colors.primaryColor,
-          ),
-        ),
-        actions: [
-          BlocConsumer<DetailCubit, DetailState>(
-            listener: (context, state) {
-              if (state is DetailSuccess) {
-                context.read<NavigationController>().pop();
-              }
-            },
-            builder: (context, state) {
-              if (state is DetailLoading) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      right: 16,
-                    ),
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              }
-              return TextButton(
-                onPressed: () async {
-                  FocusScope.of(context).requestFocus(FocusNode());
-                  if (widget.todoTableData == null) {
-                    _detailCubit.add(
-                      task: TodoTableData(
-                        id: uuid.v4(),
-                        title: _controller.text,
-                        importance: _dropdownValue,
-                        done: false,
-                        deadline: deadline,
-                        createdAt: DateTime.now(),
-                        changedAt: DateTime.now(),
-                        lastUpdatedBy: await PlatformDeviceId.getDeviceId ?? '',
-                      ),
-                    );
-                  } else {
-                    _detailCubit.edit(
-                      task: widget.todoTableData!.copyWith(
-                        title: _controller.text,
-                        importance: _dropdownValue,
-                        done: false,
-                        deadline: deadline,
-                        changedAt: DateTime.now(),
-                        lastUpdatedBy: await PlatformDeviceId.getDeviceId ?? '',
-                      ),
-                    );
-                  }
-                },
-                child: Text(
-                  S.of(context).save,
-                  style: textStyles!.button!.copyWith(color: colors.blueColor),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: DetailHeader(
+          onPressed: () async {
+            FocusScope.of(context).requestFocus(FocusNode());
+            if (widget.todoTableData == null) {
+              _detailCubit.add(
+                task: TodoTableData(
+                  id: uuid.v4(),
+                  title: _controller.text,
+                  importance: _dropdownValue,
+                  done: false,
+                  deadline: deadline,
+                  createdAt: DateTime.now(),
+                  changedAt: DateTime.now(),
+                  lastUpdatedBy: await PlatformDeviceId.getDeviceId ?? '',
                 ),
               );
-            },
-          ),
-        ],
+            } else {
+              _detailCubit.edit(
+                task: widget.todoTableData!.copyWith(
+                  title: _controller.text,
+                  importance: _dropdownValue,
+                  done: false,
+                  deadline: deadline,
+                  changedAt: DateTime.now(),
+                  lastUpdatedBy: await PlatformDeviceId.getDeviceId ?? '',
+                ),
+              );
+            }
+          },
+        ),
       ),
       body: GestureDetector(
         onTap: () {
@@ -220,64 +187,16 @@ class _DetailScreenState extends State<DetailScreen> {
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16.0,
                 ),
-                child: DropdownButton(
-                  iconEnabledColor: Colors.transparent,
-                  underline: Container(
-                    color: colors.separatorColor,
-                    height: 0.5,
-                  ),
-                  isExpanded: true,
+                child: DropdownButtonDetail(
                   onChanged: (Importance? value) {
-                    setState(() {
-                      _dropdownValue = value!;
-                    });
+                    setState(
+                      () {
+                        _dropdownValue = value!;
+                      },
+                    );
                   },
-                  hint: _dropdownValue == Importance.basic
-                      ? Text(
-                          getLabel(Importance.basic),
-                          style: textStyles?.button!.copyWith(
-                            color: colors.tertiaryColor,
-                          ),
-                        )
-                      : Text(
-                          getLabel(_dropdownValue),
-                          style: textStyles?.body!.copyWith(
-                            color: colors.primaryColor,
-                          ),
-                        ),
-                  items: [
-                    DropdownMenuItem(
-                      value: Importance.basic,
-                      child: Text(
-                        getLabel(Importance.basic),
-                        style: textStyles?.body!.copyWith(
-                          color: colors.primaryColor,
-                        ),
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: Importance.low,
-                      child: Text(
-                        getLabel(Importance.low),
-                        style: textStyles?.body!.copyWith(
-                          color: colors.primaryColor,
-                        ),
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: Importance.important,
-                      child: Text(
-                        getLabel(Importance.important),
-                        style: textStyles?.body!.copyWith(
-                          color: _remoteConfig
-                                  .getString('color_importance')
-                                  .isNotEmpty
-                              ? const Color(0xff793cd8)
-                              : colors.redColor,
-                        ),
-                      ),
-                    ),
-                  ],
+                  dropdownValue: _dropdownValue,
+                  remoteConfig: _remoteConfig,
                 ),
               ),
               Row(
@@ -398,21 +317,5 @@ class _DetailScreenState extends State<DetailScreen> {
         ),
       ),
     );
-  }
-
-  String getLabel(Importance importance) {
-    switch (importance) {
-      case Importance.low:
-        return S.of(context).low;
-
-      case Importance.basic:
-        return S.of(context).basic;
-
-      case Importance.important:
-        return S.of(context).important;
-
-      default:
-        return S.of(context).basic;
-    }
   }
 }
