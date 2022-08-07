@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:todo_app/common/res/theme/theme.dart';
+import 'package:todo_app/common/res/theme/todo_text_theme.dart';
 
-import '../common/res/theme/theme.dart';
-import '../common/res/theme/todo_text_theme.dart';
 
 class TextFieldCustom extends StatelessWidget {
   final String hintText;

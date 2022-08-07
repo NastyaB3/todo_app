@@ -1,8 +1,7 @@
 import 'package:injectable/injectable.dart';
 import 'package:todo_app/data/repositories/todo_repository.dart';
+import 'package:todo_app/data/repositories/todos_dao.dart';
 import 'package:todo_app/database/database.dart';
-
-import '../../data/repositories/todos_dao.dart';
 
 @module
 abstract class TodoModule {
