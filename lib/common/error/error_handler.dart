@@ -3,7 +3,6 @@ import 'package:todo_app/common/error/logging.dart';
 import 'package:flutter/foundation.dart';
 
 
-//TODO: доделать во второй фазе
 class ErrorHandler {
   static void init() {
     FlutterError.onError = _recordFlutterError;

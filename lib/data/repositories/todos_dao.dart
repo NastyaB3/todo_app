@@ -8,7 +8,7 @@ part 'todos_dao.g.dart';
 class TodosDao extends DatabaseAccessor<AppDb> with _$TodosDaoMixin {
   TodosDao(AppDb db) : super(db);
 
-  Future<void> addTodoAll(List<TodoTableData> tasks) async {
+  Future<void> addTodoAll(Iterable<TodoTableData> tasks) async {
     await batch(
       (batch) => batch.insertAll(
         todoTable,
@@ -36,8 +36,16 @@ class TodosDao extends DatabaseAccessor<AppDb> with _$TodosDaoMixin {
     }
   }
 
-  Future<int> remove(TodoTableData task) {
-    return delete(todoTable).delete(task);
+  Future<List<TodoTableData>> getAll() {
+    return select(todoTable).get();
+  }
+
+  Future<int> remove(String task) {
+    return (delete(todoTable)..where((tbl) => tbl.id.equals(task))).go();
+  }
+
+  Future<int> removeAll() {
+    return delete(todoTable).go();
   }
 
   Future<void> edit(TodoTableData task) async {
