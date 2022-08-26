@@ -44,28 +44,28 @@ class TextFieldCustom extends StatelessWidget {
       minLines: minLines,
       decoration: InputDecoration(
         errorText: errorText,
-        fillColor: colors.whiteColor,
+        fillColor: colors.backSecondaryColor,
         filled: true,
         hintText: hintText,
         hintStyle: textStyles.body!.copyWith(color: colors.tertiaryColor),
         border: OutlineInputBorder(
           borderSide: BorderSide(
-            color: colors.whiteColor!,
+            color: colors.backSecondaryColor!,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
-            color: colors.whiteColor!,
+            color: colors.backSecondaryColor!,
           ),
         ),
         disabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
-            color: colors.whiteColor!,
+            color:colors.backSecondaryColor!,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(
-            color: colors.whiteColor!,
+            color: colors.backSecondaryColor!,
           ),
           borderRadius: BorderRadius.circular(8),
         ),

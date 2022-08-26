@@ -20,8 +20,7 @@ class StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     final colors = Theme.of(context).extension<ColorsTheme>()!;
-    if (shrinkOffset > 40 &&
-        MediaQuery.of(context).orientation == Orientation.portrait) {
+    if (shrinkOffset > 40) {
       return Container(
         decoration: BoxDecoration(
           color: colors.backPrimaryColor,
@@ -53,21 +52,20 @@ class StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
                   padding: const EdgeInsets.only(right: 25),
                   child: hideCompleted
                       ? Icon(
-                    Icons.visibility_off,
-                    color: colors.blueColor,
-                  )
+                          Icons.visibility_off,
+                          color: colors.blueColor,
+                        )
                       : Icon(
-                    Icons.remove_red_eye,
-                    color: colors.blueColor,
-                  )),
+                          Icons.remove_red_eye,
+                          color: colors.blueColor,
+                        )),
             ),
           ],
         ),
       );
     }
 
-    if (shrinkOffset < 40 &&
-        MediaQuery.of(context).orientation == Orientation.portrait) {
+    if (shrinkOffset < 40) {
       return Container(
         padding: EdgeInsets.only(
           left: 60,
@@ -94,10 +92,10 @@ class StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
                       .extension<TodoTextTheme>()
                       ?.body
                       ?.copyWith(
-                    color: Theme.of(context)
-                        .extension<ColorsTheme>()
-                        ?.tertiaryColor,
-                  ),
+                        color: Theme.of(context)
+                            .extension<ColorsTheme>()
+                            ?.tertiaryColor,
+                      ),
                 ),
                 InkWell(
                   onTap: onToggleHideCompleted,
@@ -105,13 +103,13 @@ class StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
                       padding: const EdgeInsets.only(right: 25),
                       child: hideCompleted
                           ? Icon(
-                        Icons.visibility_off,
-                        color: colors.blueColor,
-                      )
+                              Icons.visibility_off,
+                              color: colors.blueColor,
+                            )
                           : Icon(
-                        Icons.remove_red_eye,
-                        color: colors.blueColor,
-                      )),
+                              Icons.remove_red_eye,
+                              color: colors.blueColor,
+                            )),
                 ),
               ],
             ),

@@ -1,10 +1,11 @@
-import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:todo_app/common/di/app_config.dart';
+import 'package:todo_app/common/firebase_analytics.dart';
 import 'package:todo_app/common/res/theme/theme.dart';
 import 'package:todo_app/common/res/theme/todo_text_theme.dart';
+import 'package:todo_app/common/utils.dart';
 import 'package:todo_app/data/models/todo_table.dart';
 import 'package:todo_app/data/repositories/todo_repository.dart';
 import 'package:todo_app/database/database.dart';
@@ -12,15 +13,31 @@ import 'package:todo_app/domain/details_cubit/detail_cubit.dart';
 import 'package:todo_app/domain/todo_actions/todo_actions_cubit.dart';
 import 'package:todo_app/domain/todo_list_cubit/todo_list_cubit.dart';
 import 'package:todo_app/generated/l10n.dart';
-import 'package:todo_app/navigation/controller.dart';
-import 'package:todo_app/navigation/routes.dart';
-import 'package:todo_app/screens/main_screen/task_widget.dart';
-import 'package:todo_app/screens/main_screen/header_delegate.dart';
+import 'package:todo_app/main.dart';
+import 'package:todo_app/navigation/page_configuration.dart';
+import 'package:todo_app/navigation/ui_pages.dart';
+import 'package:todo_app/common/remote_config.dart';
+import 'package:todo_app/screens/detail_screen/detail_screen.dart';
+import 'package:todo_app/screens/list_todo_screen/header_delegate.dart';
+import 'package:todo_app/screens/list_todo_screen/task_widget.dart';
 import 'package:todo_app/widgets/retry_widget.dart';
 import 'package:todo_app/widgets/text_field_custom.dart';
 import 'package:uuid/uuid.dart';
 
-class MainScreen extends StatefulWidget {
+class ListTodoScreen extends StatefulWidget {
+
+
+  static PageConfiguration newPage() {
+    return PageConfiguration(
+      key: 'ListTodoScreen',
+      path: listTodoPath,
+      uiPage: Pages.listTodo,
+      createPage: () {
+        return ListTodoScreen.newInstance();
+      },
+    );
+  }
+
   static Widget newInstance() {
     return MultiBlocProvider(
       providers: [
@@ -46,17 +63,17 @@ class MainScreen extends StatefulWidget {
           },
         ),
       ],
-      child: const MainScreen._(),
+      child: const ListTodoScreen._(),
     );
   }
 
-  const MainScreen._();
+  const ListTodoScreen._();
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<ListTodoScreen> createState() => _ListTodoScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _ListTodoScreenState extends State<ListTodoScreen> {
   final _controller = TextEditingController();
   bool hideCompleted = false;
 
@@ -66,18 +83,6 @@ class _MainScreenState extends State<MainScreen> {
 
   TodoActionsCubit get _todoActionCubit =>
       BlocProvider.of<TodoActionsCubit>(context);
-  final FirebaseRemoteConfig _remoteConfig = FirebaseRemoteConfig.instance;
-
-  Future<void> _initConfig() async {
-    await _remoteConfig.setConfigSettings(
-      RemoteConfigSettings(
-        fetchTimeout: const Duration(minutes: 1),
-        minimumFetchInterval: const Duration(seconds: 10),
-      ),
-    );
-
-    await _remoteConfig.fetchAndActivate();
-  }
 
   @override
   void initState() {
@@ -86,7 +91,7 @@ class _MainScreenState extends State<MainScreen> {
       hideCompleted: hideCompleted,
       refresh: true,
     );
-    _initConfig();
+   AppRemoteConfig().initConfig();
   }
 
   @override
@@ -105,10 +110,11 @@ class _MainScreenState extends State<MainScreen> {
       floatingActionButton: !keyboardVisible
           ? FloatingActionButton(
               backgroundColor: colors!.blueColor,
+              foregroundColor: colors.whiteColor,
+              heroTag: null,
               onPressed: () {
-                context
-                    .read<NavigationController>()
-                    .navigateTo(Routes.detailScreen);
+                router.push(DetailScreen.newPage());
+                AppFirebaseAnalytics().addTask();
               },
               child: const Icon(Icons.add),
             )
@@ -126,7 +132,7 @@ class _MainScreenState extends State<MainScreen> {
             }
             if (state is TodoListError) {
               return RetryWidget.withMessage(
-                message: state.err.toString(),
+                message: Utils.getErrorMsg(state.err, context),
                 style: textStyles!.body,
                 callback: () {
                   _todoCubit.fetch(
@@ -177,6 +183,7 @@ class _MainScreenState extends State<MainScreen> {
                                             '',
                                       ),
                                     );
+                                    AppFirebaseAnalytics().addTask();
                                     _controller.clear();
                                   },
                                   hintText: S.of(context).newDeal,
@@ -201,10 +208,11 @@ class _MainScreenState extends State<MainScreen> {
                             _todoActionCubit.toggleDone(
                               task,
                             );
+                            AppFirebaseAnalytics().doneTask();
                           },
-                          remoteConfig: _remoteConfig,
                           toggleDelete: (task) {
                             _todoActionCubit.delete(task);
+                            AppFirebaseAnalytics().deleteTask();
                           },
                         );
                       },

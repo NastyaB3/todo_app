@@ -4,18 +4,17 @@ import 'package:todo_app/common/res/theme/theme.dart';
 import 'package:todo_app/common/res/theme/todo_text_theme.dart';
 import 'package:todo_app/data/models/todo_table.dart';
 import 'package:todo_app/generated/l10n.dart';
+import 'package:todo_app/common/remote_config.dart';
 
 class DropdownButtonDetail extends StatelessWidget {
   final ValueChanged<Importance?>? onChanged;
   final Importance dropdownValue;
-  final FirebaseRemoteConfig remoteConfig;
 
-  const DropdownButtonDetail(
-      {Key? key,
-      required this.onChanged,
-      required this.dropdownValue,
-      required this.remoteConfig})
-      : super(key: key);
+  const DropdownButtonDetail({
+    Key? key,
+    required this.onChanged,
+    required this.dropdownValue,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -66,9 +65,7 @@ class DropdownButtonDetail extends StatelessWidget {
           child: Text(
             getLabel(Importance.important, context),
             style: textStyles?.body!.copyWith(
-              color: remoteConfig.getString('color_importance').isNotEmpty
-                  ? const Color(0xff793cd8)
-                  : colors.redColor,
+              color: AppRemoteConfig().getColor(context),
             ),
           ),
         ),

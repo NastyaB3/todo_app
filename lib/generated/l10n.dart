@@ -189,6 +189,56 @@ class S {
       args: [],
     );
   }
+
+  /// `Неизвестная ошибка`
+  String get unknownError {
+    return Intl.message(
+      'Неизвестная ошибка',
+      name: 'unknownError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ошибка доступа`
+  String get forbiddenError {
+    return Intl.message(
+      'Ошибка доступа',
+      name: 'forbiddenError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Произошла какая-то ошибка, попробуйте позже`
+  String get serverInternalError {
+    return Intl.message(
+      'Произошла какая-то ошибка, попробуйте позже',
+      name: 'serverInternalError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Неправильный запрос`
+  String get badRequest {
+    return Intl.message(
+      'Неправильный запрос',
+      name: 'badRequest',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Не найдено`
+  String get noFound {
+    return Intl.message(
+      'Не найдено',
+      name: 'noFound',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
