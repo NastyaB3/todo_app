@@ -28,6 +28,6 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channer: 'stable'
-      - run: flutter build ios --no-codesign
+      - run: flutter build ipa
 
 
