@@ -1,6 +1,8 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:platform_device_id/platform_device_id.dart';
 import 'package:todo_app/common/di/app_config.dart';
 import 'package:todo_app/common/firebase_analytics.dart';
 import 'package:todo_app/common/res/theme/theme.dart';
@@ -178,10 +180,13 @@ class _ListTodoScreenState extends State<ListTodoScreen> {
                                             done: false,
                                             createdAt: DateTime.now(),
                                             changedAt: DateTime.now(),
-                                            lastUpdatedBy:
-                                                await PlatformDeviceId
-                                                        .getDeviceId ??
-                                                    '',
+                                            lastUpdatedBy: Platform.isAndroid
+                                                ? (await DeviceInfoPlugin()
+                                                            .androidInfo)
+                                                        .id ??
+                                                    ''
+                                                : (await DeviceInfoPlugin().iosInfo)
+                                                    .identifierForVendor ?? '',
                                           ),
                                         );
                                         AppFirebaseAnalytics().addTask();
@@ -246,7 +251,8 @@ class _ListTodoScreenState extends State<ListTodoScreen> {
         return 'Dev';
       case Flavor.release:
         return 'Release';
-      default: return 'Dev';
+      default:
+        return 'Dev';
     }
   }
 
