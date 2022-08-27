@@ -19,7 +19,7 @@ jobs:
       - run: flutter pub get
       - run: flutter pub run build_runner build --delete-conflicting-outputs
       - run: flutter build apk --target lib/main_dev.dart
-      - run: flutter build appbundle
+      - run: flutter build appbundle --target lib/main_dev.dart
 
   build_ios:
     runs-on: macos-latest
@@ -29,7 +29,7 @@ jobs:
         with:
           channer: 'stable'
       - run: flutter pub get
-      - run: cd ios && pod install
+      - run: cd ios && pod update
       - run: flutter pub run build_runner build --delete-conflicting-outputs
       - run: flutter build ios --target lib/main_dev.dart --no-codesign
 
