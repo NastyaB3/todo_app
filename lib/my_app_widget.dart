@@ -3,13 +3,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:todo_app/common/res/theme/theme.dart';
 import 'package:todo_app/common/res/theme/todo_text_theme.dart';
 import 'package:todo_app/generated/l10n.dart';
-import 'package:todo_app/main.dart';
+import 'package:todo_app/main_core.dart';
 
 //TODO:
 //ссылка на загрузку .apk
 //testing
 //Собирается аналитика по событиям:переходы по экранам
-//Поддержаны 2 флейвора: для сборки тестинг и прод окружения (различие реализовать наличием шильдика DEV в правом верхнем углу главного экрана)
 // Доп. критерий: есть распространение через какой-то сервис вроде Firebase App Distribution
 
 class MyApp extends StatelessWidget {
@@ -139,7 +138,7 @@ class MyApp extends StatelessWidget {
       ],
       supportedLocales: S.delegate.supportedLocales,
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
       theme: ThemeData.light().copyWith(
         extensions: <ThemeExtension<dynamic>>[
           colorsLightTheme,

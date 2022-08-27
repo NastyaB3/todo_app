@@ -1,7 +1,9 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:platform_device_id/platform_device_id.dart';
 import 'package:todo_app/common/di/app_config.dart';
 import 'package:todo_app/common/firebase_analytics.dart';
 import 'package:todo_app/common/res/theme/theme.dart';
@@ -12,7 +14,7 @@ import 'package:todo_app/database/database.dart';
 import 'package:todo_app/domain/details_cubit/detail_cubit.dart';
 import 'package:todo_app/domain/todo_actions/todo_actions_cubit.dart';
 import 'package:todo_app/generated/l10n.dart';
-import 'package:todo_app/main.dart';
+import 'package:todo_app/main_core.dart';
 import 'package:todo_app/navigation/page_configuration.dart';
 import 'package:todo_app/navigation/ui_pages.dart';
 import 'package:todo_app/common/remote_config.dart';
@@ -78,7 +80,10 @@ class _DetailScreenState extends State<DetailScreen> {
   final _controller = TextEditingController();
   final uuid = const Uuid();
   final focusNode = FocusNode();
-  TodoActionsCubit get _todoActionCubit => BlocProvider.of<TodoActionsCubit>(context);
+
+  TodoActionsCubit get _todoActionCubit =>
+      BlocProvider.of<TodoActionsCubit>(context);
+
   DetailCubit get _detailCubit => BlocProvider.of<DetailCubit>(context);
 
   @override
@@ -119,7 +124,13 @@ class _DetailScreenState extends State<DetailScreen> {
                   deadline: deadline,
                   createdAt: DateTime.now(),
                   changedAt: DateTime.now(),
-                  lastUpdatedBy: await PlatformDeviceId.getDeviceId ?? '',
+                  lastUpdatedBy: Platform.isAndroid
+                      ? (await DeviceInfoPlugin()
+                      .androidInfo)
+                      .id ??
+                      ''
+                      : (await DeviceInfoPlugin().iosInfo)
+                      .identifierForVendor ?? '',
                 ),
               );
             } else {
@@ -130,7 +141,13 @@ class _DetailScreenState extends State<DetailScreen> {
                   done: false,
                   deadline: deadline,
                   changedAt: DateTime.now(),
-                  lastUpdatedBy: await PlatformDeviceId.getDeviceId ?? '',
+                  lastUpdatedBy: Platform.isAndroid
+                      ? (await DeviceInfoPlugin()
+                      .androidInfo)
+                      .id ??
+                      ''
+                      : (await DeviceInfoPlugin().iosInfo)
+                      .identifierForVendor ?? '',
                 ),
               );
             }
@@ -249,8 +266,14 @@ class _DetailScreenState extends State<DetailScreen> {
                           helpText: DateTime.now().year.toString(),
                           builder: (BuildContext context, Widget? child) {
                             return ThemeMode.system == ThemeMode.light
+                                //data: Theme.of(context).copyWith(
+                                //             colorScheme: ColorScheme.light(
+                                //               primary: Colors.yellow, // header background color
+                                //               onPrimary: Colors.black, // header text color
+                                //               onSurface: Colors.green, // body text color
+                                //             ),
                                 ? Theme(
-                                    data: ThemeData.light().copyWith(
+                                    data: Theme.of(context).copyWith(
                                       colorScheme: ColorScheme.light(
                                         primary: colors.blueColor!,
                                         onSurface: colors.primaryColor!,
@@ -259,13 +282,12 @@ class _DetailScreenState extends State<DetailScreen> {
                                     child: child!,
                                   )
                                 : Theme(
-                                    data: ThemeData.dark().copyWith(
+                                    data: Theme.of(context).copyWith(
                                       colorScheme: ColorScheme.dark(
                                         primary: colors.blueColor!,
                                         surface: colors.blueColor!,
                                         onSurface: colors.primaryColor!,
                                         onPrimary: colors.primaryColor!,
-                                        background: colors.backSecondaryColor!,
                                       ),
                                     ),
                                     child: child!,
@@ -274,7 +296,11 @@ class _DetailScreenState extends State<DetailScreen> {
                         );
                         setState(
                           () {
-                            _switchValue = value;
+                            if (deadline == null) {
+                              _switchValue = false;
+                            } else {
+                              _switchValue = value;
+                            }
                           },
                         );
                       },
@@ -299,7 +325,13 @@ class _DetailScreenState extends State<DetailScreen> {
                         done: false,
                         deadline: deadline,
                         changedAt: DateTime.now(),
-                        lastUpdatedBy: await PlatformDeviceId.getDeviceId ?? '',
+                        lastUpdatedBy: Platform.isAndroid
+                            ? (await DeviceInfoPlugin()
+                            .androidInfo)
+                            .id ??
+                            ''
+                            : (await DeviceInfoPlugin().iosInfo)
+                            .identifierForVendor ?? '',
                       ),
                     );
                     AppFirebaseAnalytics().deleteTask();
