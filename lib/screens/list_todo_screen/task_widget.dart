@@ -7,7 +7,7 @@ import 'package:todo_app/common/res/theme/theme.dart';
 import 'package:todo_app/common/res/theme/todo_text_theme.dart';
 import 'package:todo_app/data/models/todo_table.dart';
 import 'package:todo_app/database/database.dart';
-import 'package:todo_app/main.dart';
+import 'package:todo_app/main_core.dart';
 import 'package:todo_app/common/remote_config.dart';
 import 'package:todo_app/screens/detail_screen/detail_screen.dart';
 

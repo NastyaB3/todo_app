@@ -13,7 +13,7 @@ import 'package:todo_app/domain/details_cubit/detail_cubit.dart';
 import 'package:todo_app/domain/todo_actions/todo_actions_cubit.dart';
 import 'package:todo_app/domain/todo_list_cubit/todo_list_cubit.dart';
 import 'package:todo_app/generated/l10n.dart';
-import 'package:todo_app/main.dart';
+import 'package:todo_app/main_core.dart';
 import 'package:todo_app/navigation/page_configuration.dart';
 import 'package:todo_app/navigation/ui_pages.dart';
 import 'package:todo_app/common/remote_config.dart';
@@ -25,8 +25,6 @@ import 'package:todo_app/widgets/text_field_custom.dart';
 import 'package:uuid/uuid.dart';
 
 class ListTodoScreen extends StatefulWidget {
-
-
   static PageConfiguration newPage() {
     return PageConfiguration(
       key: 'ListTodoScreen',
@@ -91,7 +89,7 @@ class _ListTodoScreenState extends State<ListTodoScreen> {
       hideCompleted: hideCompleted,
       refresh: true,
     );
-   AppRemoteConfig().initConfig();
+    AppRemoteConfig().initConfig();
   }
 
   @override
@@ -119,113 +117,137 @@ class _ListTodoScreenState extends State<ListTodoScreen> {
               child: const Icon(Icons.add),
             )
           : null,
-      body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).requestFocus(FocusNode());
-        },
-        child: BlocBuilder<TodoCubit, TodoState>(
-          builder: (context, state) {
-            if (state is TodoListLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            if (state is TodoListError) {
-              return RetryWidget.withMessage(
-                message: Utils.getErrorMsg(state.err, context),
-                style: textStyles!.body,
-                callback: () {
-                  _todoCubit.fetch(
-                    hideCompleted: hideCompleted,
-                    refresh: true,
+      body: Stack(
+        children: [
+          GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+            child: BlocBuilder<TodoCubit, TodoState>(
+              builder: (context, state) {
+                if (state is TodoListLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
                   );
-                },
-              );
-            }
-            if (state is TodoListSuccess) {
-              return CustomScrollView(
-                slivers: [
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: StickyHeaderDelegate(
-                      topPadding: MediaQuery.of(context).padding.top,
-                      countDone: state.contDone,
-                      onToggleHideCompleted: () {
-                        toggleHideCompleted();
-                      },
-                      hideCompleted: hideCompleted,
-                    ),
-                  ),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      childCount: state.todos.length + 1,
-                      (context, index) {
-                        if (index == state.todos.length) {
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: BlocBuilder<DetailCubit, DetailState>(
-                              builder: (context, state) {
-                                return TextFieldCustom(
-                                  maxLines: 1,
-                                  controller: _controller,
-                                  onSubmitted: (text) async {
-                                    _detailCubit.add(
-                                      task: TodoTableData(
-                                        id: const Uuid().v4(),
-                                        title: _controller.text,
-                                        importance: Importance.basic,
-                                        done: false,
-                                        createdAt: DateTime.now(),
-                                        changedAt: DateTime.now(),
-                                        lastUpdatedBy: await PlatformDeviceId
-                                                .getDeviceId ??
-                                            '',
+                }
+                if (state is TodoListError) {
+                  return RetryWidget.withMessage(
+                    message: Utils.getErrorMsg(state.err, context),
+                    style: textStyles!.body,
+                    callback: () {
+                      _todoCubit.fetch(
+                        hideCompleted: hideCompleted,
+                        refresh: true,
+                      );
+                    },
+                  );
+                }
+                if (state is TodoListSuccess) {
+                  return CustomScrollView(
+                    slivers: [
+                      SliverPersistentHeader(
+                        pinned: true,
+                        delegate: StickyHeaderDelegate(
+                          topPadding: MediaQuery.of(context).padding.top,
+                          countDone: state.contDone,
+                          onToggleHideCompleted: () {
+                            toggleHideCompleted();
+                          },
+                          hideCompleted: hideCompleted,
+                        ),
+                      ),
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          childCount: state.todos.length + 1,
+                          (context, index) {
+                            if (index == state.todos.length) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: BlocBuilder<DetailCubit, DetailState>(
+                                  builder: (context, state) {
+                                    return TextFieldCustom(
+                                      maxLines: 1,
+                                      controller: _controller,
+                                      onSubmitted: (text) async {
+                                        _detailCubit.add(
+                                          task: TodoTableData(
+                                            id: const Uuid().v4(),
+                                            title: _controller.text,
+                                            importance: Importance.basic,
+                                            done: false,
+                                            createdAt: DateTime.now(),
+                                            changedAt: DateTime.now(),
+                                            lastUpdatedBy:
+                                                await PlatformDeviceId
+                                                        .getDeviceId ??
+                                                    '',
+                                          ),
+                                        );
+                                        AppFirebaseAnalytics().addTask();
+                                        _controller.clear();
+                                      },
+                                      hintText: S.of(context).newDeal,
+                                      prefixIcon: Container(
+                                        padding:
+                                            const EdgeInsets.only(left: 21),
+                                        child: const Icon(
+                                          Icons.add,
+                                          color: Colors.transparent,
+                                        ),
                                       ),
                                     );
-                                    AppFirebaseAnalytics().addTask();
-                                    _controller.clear();
                                   },
-                                  hintText: S.of(context).newDeal,
-                                  prefixIcon: Container(
-                                    padding: const EdgeInsets.only(left: 21),
-                                    child: const Icon(
-                                      Icons.add,
-                                      color: Colors.transparent,
-                                    ),
-                                  ),
+                                ),
+                              );
+                            }
+                            final task = state.todos[index];
+                            return TaskWidget(
+                              task: task,
+                              index: index,
+                              length: state.todos.length,
+                              toggleDone: (task) {
+                                _todoActionCubit.toggleDone(
+                                  task,
                                 );
+                                AppFirebaseAnalytics().doneTask();
                               },
-                            ),
-                          );
-                        }
-                        final task = state.todos[index];
-                        return TaskWidget(
-                          task: task,
-                          index: index,
-                          length: state.todos.length,
-                          toggleDone: (task) {
-                            _todoActionCubit.toggleDone(
-                              task,
+                              toggleDelete: (task) {
+                                _todoActionCubit.delete(task);
+                                AppFirebaseAnalytics().deleteTask();
+                              },
                             );
-                            AppFirebaseAnalytics().doneTask();
                           },
-                          toggleDelete: (task) {
-                            _todoActionCubit.delete(task);
-                            AppFirebaseAnalytics().deleteTask();
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              );
-            }
-            return Container();
-          },
-        ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return Container();
+              },
+            ),
+          ),
+          if (Config.appFlavor != Flavor.release)
+            Align(
+              alignment: Alignment.topRight,
+              child: Banner(
+                location: BannerLocation.topEnd,
+                message: getFlavor(),
+              ),
+            ),
+        ],
       ),
     );
+  }
+
+  String getFlavor() {
+    switch (Config.appFlavor) {
+      case Flavor.dev:
+        return 'Dev';
+      case Flavor.release:
+        return 'Release';
+      default: return 'Dev';
+    }
   }
 
   void toggleHideCompleted() {

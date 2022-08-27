@@ -12,7 +12,7 @@ import 'package:todo_app/database/database.dart';
 import 'package:todo_app/domain/details_cubit/detail_cubit.dart';
 import 'package:todo_app/domain/todo_actions/todo_actions_cubit.dart';
 import 'package:todo_app/generated/l10n.dart';
-import 'package:todo_app/main.dart';
+import 'package:todo_app/main_core.dart';
 import 'package:todo_app/navigation/page_configuration.dart';
 import 'package:todo_app/navigation/ui_pages.dart';
 import 'package:todo_app/common/remote_config.dart';
@@ -78,7 +78,10 @@ class _DetailScreenState extends State<DetailScreen> {
   final _controller = TextEditingController();
   final uuid = const Uuid();
   final focusNode = FocusNode();
-  TodoActionsCubit get _todoActionCubit => BlocProvider.of<TodoActionsCubit>(context);
+
+  TodoActionsCubit get _todoActionCubit =>
+      BlocProvider.of<TodoActionsCubit>(context);
+
   DetailCubit get _detailCubit => BlocProvider.of<DetailCubit>(context);
 
   @override
@@ -249,8 +252,14 @@ class _DetailScreenState extends State<DetailScreen> {
                           helpText: DateTime.now().year.toString(),
                           builder: (BuildContext context, Widget? child) {
                             return ThemeMode.system == ThemeMode.light
+                                //data: Theme.of(context).copyWith(
+                                //             colorScheme: ColorScheme.light(
+                                //               primary: Colors.yellow, // header background color
+                                //               onPrimary: Colors.black, // header text color
+                                //               onSurface: Colors.green, // body text color
+                                //             ),
                                 ? Theme(
-                                    data: ThemeData.light().copyWith(
+                                    data: Theme.of(context).copyWith(
                                       colorScheme: ColorScheme.light(
                                         primary: colors.blueColor!,
                                         onSurface: colors.primaryColor!,
@@ -259,13 +268,12 @@ class _DetailScreenState extends State<DetailScreen> {
                                     child: child!,
                                   )
                                 : Theme(
-                                    data: ThemeData.dark().copyWith(
+                                    data: Theme.of(context).copyWith(
                                       colorScheme: ColorScheme.dark(
                                         primary: colors.blueColor!,
                                         surface: colors.blueColor!,
                                         onSurface: colors.primaryColor!,
                                         onPrimary: colors.primaryColor!,
-                                        background: colors.backSecondaryColor!,
                                       ),
                                     ),
                                     child: child!,
@@ -274,7 +282,11 @@ class _DetailScreenState extends State<DetailScreen> {
                         );
                         setState(
                           () {
-                            _switchValue = value;
+                            if (deadline == null) {
+                              _switchValue = false;
+                            } else {
+                              _switchValue = value;
+                            }
                           },
                         );
                       },

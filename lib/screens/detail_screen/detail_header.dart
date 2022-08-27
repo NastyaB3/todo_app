@@ -4,7 +4,7 @@ import 'package:todo_app/common/res/theme/theme.dart';
 import 'package:todo_app/common/res/theme/todo_text_theme.dart';
 import 'package:todo_app/domain/details_cubit/detail_cubit.dart';
 import 'package:todo_app/generated/l10n.dart';
-import 'package:todo_app/main.dart';
+import 'package:todo_app/main_core.dart';
 
 class DetailHeader extends StatelessWidget {
   final VoidCallback onPressed;

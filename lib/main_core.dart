@@ -15,7 +15,7 @@ final parser = AppRouteInformationParser();
 final router = TodoRouterDelegate();
 
 
-void main() {
+void mainCore() {
   router.replaceAll(ListTodoScreen.newPage());
   configureDependencies();
   runZonedGuarded<Future<void>>(() async {
