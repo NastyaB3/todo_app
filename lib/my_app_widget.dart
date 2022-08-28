@@ -8,7 +8,6 @@ import 'package:todo_app/main_core.dart';
 //TODO:
 //ссылка на загрузку .apk
 //testing
-//Собирается аналитика по событиям:переходы по экранам
 // Доп. критерий: есть распространение через какой-то сервис вроде Firebase App Distribution
 
 class MyApp extends StatelessWidget {

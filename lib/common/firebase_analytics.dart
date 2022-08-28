@@ -23,4 +23,10 @@ class AppFirebaseAnalytics {
       name: 'done_task',
     );
   }
+
+  Future<void> logScreens({
+    required String? name,
+  }) async {
+    await _analytics.setCurrentScreen(screenName: name);
+  }
 }

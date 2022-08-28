@@ -44,25 +44,6 @@ class TodoRouterDelegate extends RouterDelegate<PageConfiguration>
     return true;
   }
 
-  // @override
-  // Future<bool> popRoute() {
-  //   if (canPop()) {
-  //     _removePage(_pages.last);
-  //     return Future.value(true);
-  //   }
-  //   return Future.value(false);
-  // }
-  //
-  // void _removePage(MaterialPage page) {
-  //   if (page != null) {
-  //     _pages.remove(page);
-  //   }
-  //   notifyListeners();
-  // }
-  //
-  // bool canPop() {
-  //   return _pages.length > 1;
-  // }
 
   MaterialPage _createPage(Widget child, PageConfiguration pageConfig) {
     return MaterialPage(
