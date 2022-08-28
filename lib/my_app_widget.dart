@@ -5,11 +5,6 @@ import 'package:todo_app/common/res/theme/todo_text_theme.dart';
 import 'package:todo_app/generated/l10n.dart';
 import 'package:todo_app/main_core.dart';
 
-//TODO:
-//ссылка на загрузку .apk
-//testing
-// Доп. критерий: есть распространение через какой-то сервис вроде Firebase App Distribution
-
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
