@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:todo_app/common/firebase_analytics.dart';
 import 'package:todo_app/common/res/theme/theme.dart';
 import 'package:todo_app/common/res/theme/todo_text_theme.dart';
 import 'package:todo_app/domain/details_cubit/detail_cubit.dart';
@@ -20,7 +21,8 @@ class DetailHeader extends StatelessWidget {
       backgroundColor: colors!.backPrimaryColor,
       leading: InkWell(
         onTap: () {
-         router.popRoute();
+          router.popRoute();
+          AppFirebaseAnalytics().logScreens(name: 'List Todos Screen');
         },
         child: Icon(
           Icons.close,
@@ -31,7 +33,7 @@ class DetailHeader extends StatelessWidget {
         BlocConsumer<DetailCubit, DetailState>(
           listener: (context, state) {
             if (state is DetailSuccess) {
-             router.popRoute();
+              router.popRoute();
             }
           },
           builder: (context, state) {

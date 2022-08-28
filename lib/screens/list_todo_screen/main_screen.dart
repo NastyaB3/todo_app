@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -106,6 +105,7 @@ class _ListTodoScreenState extends State<ListTodoScreen> {
     final textStyles = Theme.of(context).extension<TodoTextTheme>();
     final keyboardVisible = MediaQuery.of(context).viewInsets.bottom > 100;
     return Scaffold(
+      key: const ValueKey('todo_screen'),
       backgroundColor: colors?.backPrimaryColor,
       floatingActionButton: !keyboardVisible
           ? FloatingActionButton(
@@ -113,8 +113,11 @@ class _ListTodoScreenState extends State<ListTodoScreen> {
               foregroundColor: colors.whiteColor,
               heroTag: null,
               onPressed: () {
-                router.push(DetailScreen.newPage());
+                router.push(
+                  DetailScreen.newPage(),
+                );
                 AppFirebaseAnalytics().addTask();
+                AppFirebaseAnalytics().logScreens(name: 'Detail Screen');
               },
               child: const Icon(Icons.add),
             )
@@ -185,8 +188,10 @@ class _ListTodoScreenState extends State<ListTodoScreen> {
                                                             .androidInfo)
                                                         .id ??
                                                     ''
-                                                : (await DeviceInfoPlugin().iosInfo)
-                                                    .identifierForVendor ?? '',
+                                                : (await DeviceInfoPlugin()
+                                                            .iosInfo)
+                                                        .identifierForVendor ??
+                                                    '',
                                           ),
                                         );
                                         AppFirebaseAnalytics().addTask();
