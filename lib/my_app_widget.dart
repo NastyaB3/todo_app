@@ -1,19 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:provider/provider.dart';
 import 'package:todo_app/common/res/theme/theme.dart';
 import 'package:todo_app/common/res/theme/todo_text_theme.dart';
-import 'package:todo_app/database/database.dart';
 import 'package:todo_app/generated/l10n.dart';
-import 'package:todo_app/navigation/controller.dart';
-import 'package:todo_app/navigation/routes.dart';
-import 'package:todo_app/screens/detail_screen/detail_screen.dart';
-import 'package:todo_app/screens/main_screen/main_screen.dart';
+import 'package:todo_app/main_core.dart';
 
 class MyApp extends StatelessWidget {
-  final navigationController = NavigationController();
-
-  MyApp({Key? key}) : super(key: key);
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +28,7 @@ class MyApp extends StatelessWidget {
       backElevatedColor: const Color(0xffFFFFFF),
     );
     final colorsBlackTheme = ColorsTheme(
-      separatorColor: const Color(0xff000000).withOpacity(0.2),
+      separatorColor: const Color(0xffFFFFFF).withOpacity(0.2),
       overlayColor: const Color(0xff000000).withOpacity(0.32),
       primaryColor: const Color(0xffFFFFFF),
       secondaryColor: const Color(0xffFFFFFF).withOpacity(0.6),
@@ -130,58 +123,30 @@ class MyApp extends StatelessWidget {
       ),
     );
 
-    return Provider<NavigationController>.value(
-      value: navigationController,
-      child: MaterialApp(
-        localizationsDelegates: const [
-          S.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
+    return MaterialApp.router(
+      localizationsDelegates: const [
+        S.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: S.delegate.supportedLocales,
+      debugShowCheckedModeBanner: false,
+      themeMode: ThemeMode.system,
+      theme: ThemeData.light().copyWith(
+        extensions: <ThemeExtension<dynamic>>[
+          colorsLightTheme,
+          textThemeLight,
         ],
-        supportedLocales: S.delegate.supportedLocales,
-        debugShowCheckedModeBanner: false,
-        themeMode: ThemeMode.light,
-        theme: ThemeData.light().copyWith(
-          extensions: <ThemeExtension<dynamic>>[
-            colorsLightTheme,
-            textThemeLight,
-          ],
-        ),
-        darkTheme: ThemeData.dark().copyWith(
-          extensions: <ThemeExtension<dynamic>>[
-            colorsBlackTheme,
-            textThemeBlack,
-          ],
-        ),
-        onGenerateRoute: (settings) {
-          switch (settings.name) {
-            case Routes.mainScreen:
-              return MaterialPageRoute(
-                builder: (_) {
-                  return MainScreen.newInstance();
-                },
-              );
-
-            case Routes.detailScreen:
-              return MaterialPageRoute(
-                builder: (_) {
-                  return DetailScreen.newInstance(
-                    todoTableData: settings.arguments != null
-                        ? settings.arguments as TodoTableData
-                        : null,
-                  );
-                },
-              );
-
-            default:
-              return MaterialPageRoute(
-                builder: (_) => Container(),
-              );
-          }
-        },
-        navigatorKey: navigationController.key,
       ),
+      darkTheme: ThemeData.dark().copyWith(
+        extensions: <ThemeExtension<dynamic>>[
+          colorsBlackTheme,
+          textThemeBlack,
+        ],
+      ),
+      routeInformationParser: parser,
+      routerDelegate: router,
     );
   }
 }

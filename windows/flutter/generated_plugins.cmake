@@ -3,7 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  platform_device_id_windows
+  connectivity_plus_windows
   sqlite3_flutter_libs
 )
 

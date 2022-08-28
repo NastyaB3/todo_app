@@ -1,9 +1,10 @@
-import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:platform_device_id/platform_device_id.dart';
 import 'package:todo_app/common/di/app_config.dart';
+import 'package:todo_app/common/firebase_analytics.dart';
 import 'package:todo_app/common/res/theme/theme.dart';
 import 'package:todo_app/common/res/theme/todo_text_theme.dart';
 import 'package:todo_app/data/models/todo_table.dart';
@@ -12,7 +13,10 @@ import 'package:todo_app/database/database.dart';
 import 'package:todo_app/domain/details_cubit/detail_cubit.dart';
 import 'package:todo_app/domain/todo_actions/todo_actions_cubit.dart';
 import 'package:todo_app/generated/l10n.dart';
-import 'package:todo_app/navigation/controller.dart';
+import 'package:todo_app/main_core.dart';
+import 'package:todo_app/navigation/page_configuration.dart';
+import 'package:todo_app/navigation/ui_pages.dart';
+import 'package:todo_app/common/remote_config.dart';
 import 'package:todo_app/screens/detail_screen/detail_header.dart';
 import 'package:todo_app/screens/detail_screen/dropdown_button_detail.dart';
 import 'package:todo_app/widgets/text_field_custom.dart';
@@ -20,6 +24,21 @@ import 'package:uuid/uuid.dart';
 
 class DetailScreen extends StatefulWidget {
   final TodoTableData? todoTableData;
+
+  static PageConfiguration newPage({
+    TodoTableData? todoTableData,
+  }) {
+    return PageConfiguration(
+      key: 'DetailScreen',
+      path: detailsPath,
+      uiPage: Pages.detail,
+      createPage: () {
+        return DetailScreen.newInstance(
+          todoTableData: todoTableData,
+        );
+      },
+    );
+  }
 
   static Widget newInstance({
     TodoTableData? todoTableData,
@@ -60,18 +79,6 @@ class _DetailScreenState extends State<DetailScreen> {
   final _controller = TextEditingController();
   final uuid = const Uuid();
   final focusNode = FocusNode();
-  final FirebaseRemoteConfig _remoteConfig = FirebaseRemoteConfig.instance;
-
-  Future<void> _initConfig() async {
-    await _remoteConfig.setConfigSettings(
-      RemoteConfigSettings(
-        fetchTimeout: const Duration(minutes: 1),
-        minimumFetchInterval: const Duration(seconds: 10),
-      ),
-    );
-
-    await _remoteConfig.fetchAndActivate();
-  }
 
   TodoActionsCubit get _todoActionCubit =>
       BlocProvider.of<TodoActionsCubit>(context);
@@ -86,7 +93,7 @@ class _DetailScreenState extends State<DetailScreen> {
       deadline = widget.todoTableData!.deadline;
       _dropdownValue = widget.todoTableData!.importance;
     }
-    _initConfig();
+    AppRemoteConfig().initConfig();
   }
 
   @override
@@ -116,7 +123,13 @@ class _DetailScreenState extends State<DetailScreen> {
                   deadline: deadline,
                   createdAt: DateTime.now(),
                   changedAt: DateTime.now(),
-                  lastUpdatedBy: await PlatformDeviceId.getDeviceId ?? '',
+                  lastUpdatedBy: Platform.isAndroid
+                      ? (await DeviceInfoPlugin()
+                      .androidInfo)
+                      .id ??
+                      ''
+                      : (await DeviceInfoPlugin().iosInfo)
+                      .identifierForVendor ?? '',
                 ),
               );
             } else {
@@ -127,7 +140,13 @@ class _DetailScreenState extends State<DetailScreen> {
                   done: false,
                   deadline: deadline,
                   changedAt: DateTime.now(),
-                  lastUpdatedBy: await PlatformDeviceId.getDeviceId ?? '',
+                  lastUpdatedBy: Platform.isAndroid
+                      ? (await DeviceInfoPlugin()
+                      .androidInfo)
+                      .id ??
+                      ''
+                      : (await DeviceInfoPlugin().iosInfo)
+                      .identifierForVendor ?? '',
                 ),
               );
             }
@@ -196,7 +215,6 @@ class _DetailScreenState extends State<DetailScreen> {
                     );
                   },
                   dropdownValue: _dropdownValue,
-                  remoteConfig: _remoteConfig,
                 ),
               ),
               Row(
@@ -232,31 +250,56 @@ class _DetailScreenState extends State<DetailScreen> {
                   Padding(
                     padding: const EdgeInsets.only(right: 16.0),
                     child: Switch(
+                      activeColor: colors.blueColor,
                       value: _switchValue,
                       onChanged: (value) async {
                         deadline = await showDatePicker(
+                          initialDatePickerMode: DatePickerMode.day,
                           context: context,
                           initialDate: DateTime.now(),
+                          initialEntryMode: DatePickerEntryMode.calendarOnly,
                           locale: const Locale('ru'),
                           firstDate: DateTime(2015),
                           lastDate: DateTime(2050),
                           confirmText: S.of(context).ready,
                           helpText: DateTime.now().year.toString(),
                           builder: (BuildContext context, Widget? child) {
-                            return Theme(
-                              data: ThemeData.light().copyWith(
-                                colorScheme: ColorScheme.light(
-                                  primary: colors.blueColor!,
-                                  onSurface: colors.primaryColor!,
-                                ),
-                              ),
-                              child: child!,
-                            );
+                            return ThemeMode.system == ThemeMode.light
+                                //data: Theme.of(context).copyWith(
+                                //             colorScheme: ColorScheme.light(
+                                //               primary: Colors.yellow, // header background color
+                                //               onPrimary: Colors.black, // header text color
+                                //               onSurface: Colors.green, // body text color
+                                //             ),
+                                ? Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: ColorScheme.light(
+                                        primary: colors.blueColor!,
+                                        onSurface: colors.primaryColor!,
+                                      ),
+                                    ),
+                                    child: child!,
+                                  )
+                                : Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: ColorScheme.dark(
+                                        primary: colors.blueColor!,
+                                        surface: colors.blueColor!,
+                                        onSurface: colors.primaryColor!,
+                                        onPrimary: colors.primaryColor!,
+                                      ),
+                                    ),
+                                    child: child!,
+                                  );
                           },
                         );
                         setState(
                           () {
-                            _switchValue = value;
+                            if (deadline == null) {
+                              _switchValue = false;
+                            } else {
+                              _switchValue = value;
+                            }
                           },
                         );
                       },
@@ -281,10 +324,17 @@ class _DetailScreenState extends State<DetailScreen> {
                         done: false,
                         deadline: deadline,
                         changedAt: DateTime.now(),
-                        lastUpdatedBy: await PlatformDeviceId.getDeviceId ?? '',
+                        lastUpdatedBy: Platform.isAndroid
+                            ? (await DeviceInfoPlugin()
+                            .androidInfo)
+                            .id ??
+                            ''
+                            : (await DeviceInfoPlugin().iosInfo)
+                            .identifierForVendor ?? '',
                       ),
                     );
-                    context.read<NavigationController>().pop();
+                    AppFirebaseAnalytics().deleteTask();
+                    router.popRoute();
                   }
                 },
                 child: Padding(

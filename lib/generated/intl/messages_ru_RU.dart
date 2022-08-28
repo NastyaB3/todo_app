@@ -23,10 +23,14 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "appBar": MessageLookupByLibrary.simpleMessage("Мои дела"),
+        "badRequest":
+            MessageLookupByLibrary.simpleMessage("Неправильный запрос"),
         "basic": MessageLookupByLibrary.simpleMessage("Нет"),
         "delete": MessageLookupByLibrary.simpleMessage("Удалить"),
         "done": MessageLookupByLibrary.simpleMessage("Выполнено"),
         "errorText": MessageLookupByLibrary.simpleMessage("Ошибка"),
+        "forbiddenError":
+            MessageLookupByLibrary.simpleMessage("Ошибка доступа"),
         "importance": MessageLookupByLibrary.simpleMessage("Важность"),
         "important": MessageLookupByLibrary.simpleMessage("!! Высокий"),
         "low": MessageLookupByLibrary.simpleMessage("Низкий"),
@@ -34,8 +38,13 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Сделать до"),
         "needToDo": MessageLookupByLibrary.simpleMessage("Что надо сделать.."),
         "newDeal": MessageLookupByLibrary.simpleMessage("Новое"),
+        "noFound": MessageLookupByLibrary.simpleMessage("Не найдено"),
         "ready": MessageLookupByLibrary.simpleMessage("ГОТОВО"),
         "retry": MessageLookupByLibrary.simpleMessage("Попробовать снова"),
-        "save": MessageLookupByLibrary.simpleMessage("СОХРАНИТЬ")
+        "save": MessageLookupByLibrary.simpleMessage("СОХРАНИТЬ"),
+        "serverInternalError": MessageLookupByLibrary.simpleMessage(
+            "Произошла какая-то ошибка, попробуйте позже"),
+        "unknownError":
+            MessageLookupByLibrary.simpleMessage("Неизвестная ошибка")
       };
 }

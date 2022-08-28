@@ -12,7 +12,7 @@ enum Importance {
 }
 
 class TodoTable extends Table {
-  TextColumn get id => text().unique()();
+  TextColumn get id => text()();
 
   TextColumn get title => text()();
 

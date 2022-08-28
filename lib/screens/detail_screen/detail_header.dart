@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
+import 'package:todo_app/common/firebase_analytics.dart';
 import 'package:todo_app/common/res/theme/theme.dart';
 import 'package:todo_app/common/res/theme/todo_text_theme.dart';
 import 'package:todo_app/domain/details_cubit/detail_cubit.dart';
 import 'package:todo_app/generated/l10n.dart';
-import 'package:todo_app/navigation/controller.dart';
+import 'package:todo_app/main_core.dart';
 
 class DetailHeader extends StatelessWidget {
   final VoidCallback onPressed;
@@ -21,7 +21,8 @@ class DetailHeader extends StatelessWidget {
       backgroundColor: colors!.backPrimaryColor,
       leading: InkWell(
         onTap: () {
-          context.read<NavigationController>().pop();
+          router.popRoute();
+          AppFirebaseAnalytics().logScreens(name: 'List Todos Screen');
         },
         child: Icon(
           Icons.close,
@@ -32,7 +33,7 @@ class DetailHeader extends StatelessWidget {
         BlocConsumer<DetailCubit, DetailState>(
           listener: (context, state) {
             if (state is DetailSuccess) {
-              context.read<NavigationController>().pop();
+              router.popRoute();
             }
           },
           builder: (context, state) {
@@ -48,34 +49,6 @@ class DetailHeader extends StatelessWidget {
             }
             return TextButton(
               onPressed: onPressed,
-              // onPressed: () async {
-              //   FocusScope.of(context).requestFocus(FocusNode());
-              //   if (widget.todoTableData == null) {
-              //     _detailCubit.add(
-              //       task: TodoTableData(
-              //         id: uuid.v4(),
-              //         title: _controller.text,
-              //         importance: _dropdownValue,
-              //         done: false,
-              //         deadline: deadline,
-              //         createdAt: DateTime.now(),
-              //         changedAt: DateTime.now(),
-              //         lastUpdatedBy: await PlatformDeviceId.getDeviceId ?? '',
-              //       ),
-              //     );
-              //   } else {
-              //     _detailCubit.edit(
-              //       task: widget.todoTableData!.copyWith(
-              //         title: _controller.text,
-              //         importance: _dropdownValue,
-              //         done: false,
-              //         deadline: deadline,
-              //         changedAt: DateTime.now(),
-              //         lastUpdatedBy: await PlatformDeviceId.getDeviceId ?? '',
-              //       ),
-              //     );
-              //   }
-              // },
               child: Text(
                 S.of(context).save,
                 style: textStyles!.button!.copyWith(color: colors.blueColor),

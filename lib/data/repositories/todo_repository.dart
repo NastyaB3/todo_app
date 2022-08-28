@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:todo_app/common/api_repository.dart';
 import 'package:todo_app/data/models/plans_response.dart';
 import 'package:todo_app/data/models/plan_response.dart';
@@ -14,40 +15,74 @@ class TodoRepository {
 
   //Получает список с сервера
   Future<void> syncPlans() async {
-    final response = await ApiRepository.getInstance().get('/list');
-    final plans = PlansResponse.fromJson(response.data);
-    _updateRevision(plans.revision);
-    await todoDao.addTodoAll(plans.list);
+    if (await _isHaveConnection()) {
+      final response = await ApiRepository.getInstance().get('/list');
+      final plans = PlansResponse.fromJson(response.data);
+      _updateRevision(plans.revision);
+      final locals = await todoDao.getAll();
+      final remote = {for (var element in plans.list) element.id: element};
+
+      for (var element in locals) {
+        final searched = remote[element.id];
+        if (searched != null && element.changedAt.isAfter(searched.changedAt)) {
+          remote[element.id] = element;
+        } else if (searched == null) {
+          remote[element.id] = element;
+        }
+      }
+
+      ApiRepository.getInstance().options.headers['X-Last-Known-Revision'] =
+          await _getRevision();
+      final res = await ApiRepository.getInstance().patch(
+        '/list',
+        data: {
+          'list': remote.values
+              .map(
+                (e) => TodoTable.toJson(e),
+              )
+              .toList()
+        },
+      );
+      final revision = PlansResponse.fromJson(res.data).revision;
+
+      _updateRevision(revision);
+      await todoDao.removeAll();
+      await todoDao.addTodoAll(remote.values);
+    }
   }
 
   Future<void> add(TodoTableData task) async {
-    ApiRepository.getInstance().options.headers['X-Last-Known-Revision'] =
-        await _getRevision();
-    final response = await ApiRepository.getInstance().post(
-      '/list',
-      data: {
-        'element': TodoTable.toJson(task),
-      },
-    );
+    if (await _isHaveConnection()) {
+      ApiRepository.getInstance().options.headers['X-Last-Known-Revision'] =
+          await _getRevision();
+      final response = await ApiRepository.getInstance().post(
+        '/list',
+        data: {
+          'element': TodoTable.toJson(task),
+        },
+      );
 
-    final item = PlanResponse.fromJson(response.data);
-    await _updateRevision(item.revision);
-    await todoDao.addTodo(item.element);
+      final item = PlanResponse.fromJson(response.data);
+      await _updateRevision(item.revision);
+    }
+    await todoDao.addTodo(task);
   }
 
   Future<void> edit(TodoTableData task) async {
-    ApiRepository.getInstance().options.headers['X-Last-Known-Revision'] =
-        await _getRevision();
-    final response = await ApiRepository.getInstance().put(
-      '/list/${task.id}',
-      data: {
-        'element': TodoTable.toJson(task),
-      },
-    );
+    if (await _isHaveConnection()) {
+      ApiRepository.getInstance().options.headers['X-Last-Known-Revision'] =
+          await _getRevision();
+      final response = await ApiRepository.getInstance().put(
+        '/list/${task.id}',
+        data: {
+          'element': TodoTable.toJson(task),
+        },
+      );
 
-    final item = PlanResponse.fromJson(response.data);
-    await _updateRevision(item.revision);
-    await todoDao.edit(item.element);
+      final item = PlanResponse.fromJson(response.data);
+      await _updateRevision(item.revision);
+    }
+    await todoDao.edit(task);
   }
 
   Future<int> countToDo() async {
@@ -61,15 +96,17 @@ class TodoRepository {
   }
 
   Future<void> remove(String taskId) async {
-    ApiRepository.getInstance().options.headers['X-Last-Known-Revision'] =
-        await _getRevision();
-    final response = await ApiRepository.getInstance().delete(
-      '/list/$taskId',
-    );
+    if (await _isHaveConnection()) {
+      ApiRepository.getInstance().options.headers['X-Last-Known-Revision'] =
+          await _getRevision();
+      final response = await ApiRepository.getInstance().delete(
+        '/list/$taskId',
+      );
 
-    final item = PlanResponse.fromJson(response.data);
-    await _updateRevision(item.revision);
-    await todoDao.remove(item.element);
+      final item = PlanResponse.fromJson(response.data);
+      await _updateRevision(item.revision);
+    }
+    await todoDao.remove(taskId);
   }
 
   Future<int> _getRevision() async {
@@ -84,5 +121,11 @@ class TodoRepository {
   Future<void> _updateRevision(int revision) async {
     final sp = await SharedPreferences.getInstance();
     await sp.setInt(_revisionKey, revision);
+  }
+
+  Future<bool> _isHaveConnection() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    return connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.wifi;
   }
 }

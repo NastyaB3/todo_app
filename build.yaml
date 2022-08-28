@@ -1,0 +1,12 @@
+targets:
+  $default:
+    builders:
+      mockito|mockBuilder:
+        enabled: false
+
+  run_mockito:
+    dependencies: ["$default"]
+    auto_apply_builders: false
+    builders:
+      mockito|mockBuilder:
+        enabled: true
