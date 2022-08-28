@@ -12,4 +12,6 @@ class ServerInternal extends NetworkException {}
 
 class Forbidden extends NetworkException {}
 
+class Unauthorized extends NetworkException {}
+
 class UnknownError extends NetworkException {}

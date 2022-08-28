@@ -19,4 +19,6 @@ Remote Config:
 
 
 android apk:
-<app dir>build/app/outputs/flutter-apk/app-release.apk
+flutter build apk --target lib/main_dev.dart
+android apk тут(есть релиз версия и дев(с шильдиком Dev)): 
+https://drive.google.com/drive/folders/1eM4HW56zqMnPUcx67TexPK90alGf5DOg?usp=sharing

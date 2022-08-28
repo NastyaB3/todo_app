@@ -11,7 +11,7 @@ import 'package:todo_app/my_app_widget.dart';
 import 'package:todo_app/screens/list_todo_screen/main_screen.dart';
 
 
-void main(){
+void main() {
   router.replaceAll(ListTodoScreen.newPage());
   configureDependencies();
   runZonedGuarded<Future<void>>(() async {
@@ -23,8 +23,10 @@ void main(){
     initLogger();
     logger.info('Start test main');
     ErrorHandler.init();
+
     runApp(const MyApp());
-  },
-      (error, stack) =>
-          FirebaseCrashlytics.instance.recordError(error, stack, fatal: true));
+  }, (error, stack) {
+    print(error);
+    print(stack);
+  });
 }

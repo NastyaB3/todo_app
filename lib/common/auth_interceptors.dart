@@ -26,6 +26,9 @@ class AuthInterceptors extends InterceptorsWrapper {
     if (statusCode == 403) {
       return handler.reject(Forbidden());
     }
+    if (statusCode == 401) {
+      return handler.reject(Unauthorized());
+    }
 
     if (statusCode == 404) {
       return handler.reject(NotFound());
